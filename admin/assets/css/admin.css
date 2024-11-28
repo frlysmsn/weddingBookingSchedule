@@ -1,0 +1,80 @@
+:root {
+    --primary-color: #4e73df;
+    --secondary-color: #858796;
+    --sidebar-width: 250px;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    background: #f8f9fc;
+    overflow-x: hidden;
+}
+
+.main-content {
+    margin-left: var(--sidebar-width);
+    padding: 1.5rem;
+    min-height: 100vh;
+    background: #f8f9fc;
+    transition: all 0.3s ease;
+}
+
+.main-content.expanded {
+    margin-left: 0;
+}
+
+/* Card Styles */
+.card {
+    border: none;
+    border-radius: 0.35rem;
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.card-header {
+    background-color: #f8f9fc;
+    border-bottom: 1px solid #e3e6f0;
+    padding: 1rem 1.25rem;
+}
+
+/* Hamburger Menu */
+.hamburger {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1001;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 0.35rem;
+    cursor: pointer;
+    display: none;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .main-content {
+        margin-left: 0;
+    }
+    
+    .hamburger {
+        display: block;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+} 

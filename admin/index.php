@@ -2,35 +2,21 @@
 session_start();
 require_once '../includes/config.php';
 require_once '../includes/db_connection.php';
-require_once '../includes/Authentication.php';
 
-$auth = new Authentication();
-
-// Ensure only admins can access this area
-if (!$auth->isAdmin()) {
-    header('Location: login.php');
+if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+    header('Location: ../index.php');
     exit;
 }
 
 $db = Database::getInstance()->getConnection();
 
-// Get statistics
-$stats = [
-    'pending' => $db->query("SELECT COUNT(*) FROM bookings WHERE status = 'pending'")->fetchColumn(),
-    'approved' => $db->query("SELECT COUNT(*) FROM bookings WHERE status = 'approved'")->fetchColumn(),
-    'total' => $db->query("SELECT COUNT(*) FROM bookings")->fetchColumn(),
-    'users' => $db->query("SELECT COUNT(*) FROM users WHERE role = 'client'")->fetchColumn()
-];
+$stmt = $db->prepare("SELECT COUNT(*) FROM documents WHERE status = 'pending'");
+$stmt->execute();
+$pending_docs = $stmt->fetchColumn();
 
-// Get recent bookings
-$stmt = $db->query("
-    SELECT b.*, u.name, u.email 
-    FROM bookings b 
-    JOIN users u ON b.user_id = u.id 
-    ORDER BY b.created_at DESC 
-    LIMIT 5
-");
-$recent_bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt = $db->prepare("SELECT COUNT(*) FROM bookings WHERE status = 'pending'");
+$stmt->execute();
+$pending_bookings = $stmt->fetchColumn();
 ?>
 
 <!DOCTYPE html>
@@ -38,176 +24,89 @@ $recent_bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - <?= SITE_NAME ?></title>
-    <link href='../assets/css/admin.css' rel='stylesheet'>
-    <link href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css' rel='stylesheet'>
-    <link href='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css' rel='stylesheet'>
+    <title>Admin Dashboard - St. Rita Parish</title>
+    
+    <!-- Frameworks and Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="assets/css/admin.css" rel="stylesheet">
+    <link href="assets/css/sidebar.css" rel="stylesheet">
 </head>
 <body>
-    <div class="admin-layout">
-        <!-- Admin Sidebar -->
-        <div class="admin-sidebar">
-            <div class="sidebar-header">
-                <h2><?= SITE_NAME ?></h2>
-            </div>
-            <nav class="sidebar-nav">
-                <a href="index.php" class="active">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
-                </a>
-                <a href="bookings.php">
-                    <i class="fas fa-calendar-check"></i> Bookings
-                </a>
-                <a href="users.php">
-                    <i class="fas fa-users"></i> Users
-                </a>
-                <a href="settings.php">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-                <a href="../logout.php">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </a>
-            </nav>
+    <!-- Hamburger Menu -->
+    <button class="hamburger">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="sidebar-header">
+            <img src="../assets/images/logo.png" alt="Logo" class="logo">
+            <h3>St. Rita Parish</h3>
         </div>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link <?= !isset($_GET['page']) || $_GET['page'] === 'dashboard' ? 'active' : '' ?>" 
+                   href="index.php">
+                    <span><i class="fas fa-tachometer-alt"></i> Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['page']) && $_GET['page'] === 'document_approval' ? 'active' : '' ?>" 
+                   href="index.php?page=document_approval">
+                    <span><i class="fas fa-file-alt"></i> Document Approval</span>
+                    <?php if($pending_docs > 0): ?>
+                        <span class="badge bg-danger"><?= $pending_docs ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['page']) && $_GET['page'] === 'bookings' ? 'active' : '' ?>" 
+                   href="index.php?page=bookings">
+                    <span><i class="fas fa-calendar-alt"></i> Bookings</span>
+                    <?php if($pending_bookings > 0): ?>
+                        <span class="badge bg-danger"><?= $pending_bookings ?></span>
+                    <?php endif; ?>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link <?= isset($_GET['page']) && $_GET['page'] === 'users' ? 'active' : '' ?>" 
+                   href="index.php?page=users">
+                    <span><i class="fas fa-users"></i> Users</span>
+                </a>
+            </li>
+            <li class="nav-item mt-auto">
+                <a class="nav-link" href="../logout.php">
+                    <span><i class="fas fa-sign-out-alt"></i> Logout</span>
+                </a>
+            </li>
+        </ul>
+    </div>
 
-        <!-- Main Content -->
-        <div class="admin-main">
-            <div class="admin-header">
-                <h1>Welcome, <?= htmlspecialchars($_SESSION['name']) ?></h1>
-            </div>
-
-            <div class="admin-content">
-                <!-- Statistics Cards -->
-                <div class="stats-container">
-                    <div class="stat-card">
-                        <div class="stat-icon pending">
-                            <i class="fas fa-clock"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h3>Pending Bookings</h3>
-                            <p><?= $stats['pending'] ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon approved">
-                            <i class="fas fa-calendar-check"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h3>Approved Bookings</h3>
-                            <p><?= $stats['approved'] ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon total">
-                            <i class="fas fa-calendar-alt"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h3>Total Bookings</h3>
-                            <p><?= $stats['total'] ?></p>
-                        </div>
-                    </div>
-                    
-                    <div class="stat-card">
-                        <div class="stat-icon users">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="stat-details">
-                            <h3>Total Clients</h3>
-                            <p><?= $stats['users'] ?></p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Recent Bookings -->
-                <div class="recent-bookings">
-                    <h3>Recent Bookings</h3>
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    <th>Date</th>
-                                    <th>Client</th>
-                                    <th>Status</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($recent_bookings as $booking): ?>
-                                    <tr>
-                                        <td><?= date('M d, Y', strtotime($booking['wedding_date'])) ?></td>
-                                        <td>
-                                            <?= htmlspecialchars($booking['name']) ?><br>
-                                            <small><?= htmlspecialchars($booking['email']) ?></small>
-                                        </td>
-                                        <td>
-                                            <span class="status-badge status-<?= $booking['status'] ?>">
-                                                <?= ucfirst($booking['status']) ?>
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <button onclick="viewBooking(<?= $booking['id'] ?>)" 
-                                                    class="btn btn-sm btn-info">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button onclick="updateStatus(<?= $booking['id'] ?>, 'approved')" 
-                                                    class="btn btn-sm btn-success">
-                                                <i class="fas fa-check"></i>
-                                            </button>
-                                            <button onclick="updateStatus(<?= $booking['id'] ?>, 'rejected')" 
-                                                    class="btn btn-sm btn-danger">
-                                                <i class="fas fa-times"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- Main Content -->
+    <div class="main-content">
+        <?php
+        $page = $_GET['page'] ?? 'dashboard';
+        $valid_pages = ['dashboard', 'document_approval', 'bookings', 'users'];
+        
+        if(in_array($page, $valid_pages)) {
+            include "views/{$page}.php";
+        } else {
+            include "views/dashboard.php";
+        }
+        ?>
     </div>
 
     <!-- Scripts -->
-    <script src='https://code.jquery.com/jquery-3.6.3.min.js'></script>
-    <script src='https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js'></script>
-    <script>
-    function viewBooking(id) {
-        $.get('../api/get-booking-details.php', { booking_id: id })
-            .done(function(response) {
-                Swal.fire({
-                    title: 'Booking Details',
-                    html: response,
-                    width: '600px'
-                });
-            });
-    }
-
-    function updateStatus(id, status) {
-        Swal.fire({
-            title: 'Confirm Status Update',
-            text: `Are you sure you want to mark this booking as ${status}?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Yes, update it!',
-            cancelButtonText: 'No, cancel'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('../api/update-booking-status.php', {
-                    booking_id: id,
-                    status: status
-                })
-                .done(function(response) {
-                    Swal.fire('Updated!', 'Booking status has been updated.', 'success')
-                    .then(() => location.reload());
-                })
-                .fail(function() {
-                    Swal.fire('Error!', 'Failed to update status.', 'error');
-                });
-            }
-        });
-    }
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
+    <script src="assets/js/admin.js"></script>
 </body>
 </html> 

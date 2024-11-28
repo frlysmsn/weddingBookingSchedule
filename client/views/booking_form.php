@@ -52,58 +52,52 @@ foreach($uploaded_docs as $doc) {
     $docs_by_type[$doc['document_type']] = $doc;
 }
 
-// Calculate progress
-$total_docs = count($required_docs);
-$uploaded_count = count($docs_by_type);
-$approved_count = 0;
-foreach($docs_by_type as $doc) {
-    if($doc['status'] === 'approved') {
-        $approved_count++;
+// Get document upload progress
+$stmt = $db->prepare("
+    SELECT 
+        COUNT(DISTINCT d.document_type) as uploaded_docs,
+        SUM(CASE WHEN d.status = 'approved' THEN 1 ELSE 0 END) as approved_docs
+    FROM documents d
+    JOIN bookings b ON d.booking_id = b.id
+    WHERE b.user_id = ? 
+    AND d.document_type IN ('baptismal', 'confirmation', 'birth_certificate', 'marriage_license')
+");
+$stmt->execute([$_SESSION['user_id']]);
+$doc_progress = $stmt->fetch(PDO::FETCH_ASSOC);
+
+$total_required_docs = 4;
+$current_step = 1;
+if ($doc_progress['uploaded_docs'] >= $total_required_docs) {
+    $current_step = 2;
+    if ($doc_progress['approved_docs'] >= $total_required_docs) {
+        $current_step = 3;
     }
-}
-$progress = ($total_docs > 0) ? round(($approved_count / $total_docs) * 100) : 0;
-
-// Get available time slots
-$timeSlots = [
-    '08:00' => '8:00 AM',
-    '10:00' => '10:00 AM',
-    '14:00' => '2:00 PM',
-    '16:00' => '4:00 PM'
-];
-
-// Check if date is selected
-$selected_date = isset($_GET['date']) ? $_GET['date'] : '';
-
-// If date is selected, check available slots
-if ($selected_date) {
-    $stmt = $db->prepare("
-        SELECT preferred_time 
-        FROM bookings 
-        WHERE wedding_date = ? 
-        AND status != 'cancelled'
-    ");
-    $stmt->execute([$selected_date]);
-    $booked_slots = $stmt->fetchAll(PDO::FETCH_COLUMN);
 }
 ?>
 
-<div class="booking-container">
-    <!-- Progress Tracker -->
-    <div class="progress-tracker">
-        <div class="step <?= $progress == 0 ? 'active' : ($progress > 0 ? 'completed' : '') ?>">
-            <div class="step-icon">
-                <i class="fas fa-file-upload"></i>
-            </div>
-            <div class="step-label">Upload Documents</div>
-            <div class="step-progress"><?= $uploaded_count ?>/<?= $total_docs ?></div>
+<!-- Progress Tracker -->
+<div class="progress-tracker">
+    <div class="progress-step <?= $current_step >= 1 ? 'active' : '' ?> <?= $current_step > 1 ? 'completed' : '' ?>">
+        <div class="step-icon">
+            <i class="fas fa-file-upload"></i>
         </div>
-        <div class="step <?= $progress == 100 ? 'active' : '' ?>">
-            <div class="step-icon">
-                <i class="fas fa-calendar-plus"></i>
-            </div>
-            <div class="step-label">Book Wedding Date</div>
-        </div>
+        <div class="step-label">Upload Documents</div>
+        <div class="step-progress"><?= $doc_progress['uploaded_docs'] ?>/<?= $total_required_docs ?></div>
     </div>
+    <div class="progress-step <?= $current_step >= 2 ? 'active' : '' ?> <?= $current_step > 2 ? 'completed' : '' ?>">
+        <div class="step-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="step-label">Document Approval</div>
+        <div class="step-progress"><?= $doc_progress['approved_docs'] ?>/<?= $total_required_docs ?></div>
+    </div>
+    <div class="progress-step <?= $current_step >= 3 ? 'active' : '' ?>">
+        <div class="step-icon">
+            <i class="fas fa-calendar-alt"></i>
+        </div>
+        <div class="step-label">Book Wedding Date</div>
+    </div>
+</div>
 
     <!-- Document Upload Section -->
     <div class="section document-section">

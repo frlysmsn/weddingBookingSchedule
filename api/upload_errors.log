@@ -1,0 +1,308 @@
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: Upload attempt started
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: User ID: 4
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: POST data: Array
+(
+    [document_type] => baptismal
+)
+
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php6E0D.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: Document type: baptismal
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: Creating new booking
+
+[28-Nov-2024 15:48:00 Europe/Berlin] 2024-11-28 15:48:00 - DEBUG: Error occurred: SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`st_rita_wedding`.`bookings`, CONSTRAINT `bookings_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`))
+
+[2024-11-28 15:48:58] Upload attempt started
+[2024-11-28 15:48:58] User ID: 4
+[2024-11-28 15:48:58] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-11-28 15:48:58] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Manzo-AddData_Act1.pdf
+            [full_path] => Manzo-AddData_Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php4F76.tmp
+            [error] => 0
+            [size] => 459742
+        )
+
+)
+
+[2024-11-28 15:48:58] Document type: baptismal
+[2024-11-28 15:48:58] Error occurred: Invalid user ID
+[2024-11-28 15:49:27] Upload attempt started
+[2024-11-28 15:49:27] User ID: 2
+[2024-11-28 15:49:27] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-11-28 15:49:27] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpC1E7.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-11-28 15:49:27] Document type: baptismal
+[2024-11-28 15:49:27] Transaction started
+[2024-11-28 15:49:27] Creating new booking
+[2024-11-28 15:49:27] Created new booking: 4
+[2024-11-28 15:49:27] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/4
+[2024-11-28 15:49:27] Transaction committed successfully
+[2024-11-28 15:49:47] Upload attempt started
+[2024-11-28 15:49:47] User ID: 2
+[2024-11-28 15:49:47] POST data: Array
+(
+    [document_type] => confirmation
+)
+
+[2024-11-28 15:49:47] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Manzo-AddData_Act1.pdf
+            [full_path] => Manzo-AddData_Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php10A5.tmp
+            [error] => 0
+            [size] => 459742
+        )
+
+)
+
+[2024-11-28 15:49:47] Document type: confirmation
+[2024-11-28 15:49:48] Transaction started
+[2024-11-28 15:49:48] Using existing booking ID: 4
+[2024-11-28 15:49:48] Transaction committed successfully
+[2024-11-28 15:49:53] Upload attempt started
+[2024-11-28 15:49:53] User ID: 2
+[2024-11-28 15:49:53] POST data: Array
+(
+    [document_type] => birth_certificate
+)
+
+[2024-11-28 15:49:53] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php242E.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-11-28 15:49:53] Document type: birth_certificate
+[2024-11-28 15:49:53] Transaction started
+[2024-11-28 15:49:53] Using existing booking ID: 4
+[2024-11-28 15:49:53] Transaction committed successfully
+[2024-11-28 15:49:57] Upload attempt started
+[2024-11-28 15:49:57] User ID: 2
+[2024-11-28 15:49:57] POST data: Array
+(
+    [document_type] => cenomar
+)
+
+[2024-11-28 15:49:57] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php35D2.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-11-28 15:49:57] Document type: cenomar
+[2024-11-28 15:49:57] Transaction started
+[2024-11-28 15:49:57] Using existing booking ID: 4
+[2024-11-28 15:49:57] Transaction committed successfully
+[2024-11-28 15:50:04] Upload attempt started
+[2024-11-28 15:50:04] User ID: 2
+[2024-11-28 15:50:04] POST data: Array
+(
+    [document_type] => marriage_license
+)
+
+[2024-11-28 15:50:04] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php5070.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-11-28 15:50:04] Document type: marriage_license
+[2024-11-28 15:50:04] Transaction started
+[2024-11-28 15:50:04] Using existing booking ID: 4
+[2024-11-28 15:50:04] Transaction committed successfully
+[2024-11-28 16:37:22] Upload attempt started
+[2024-11-28 16:37:22] User ID: 4
+[2024-11-28 16:37:22] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-11-28 16:37:22] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Interactive Campus Navigation Kiosk.pdf
+            [full_path] => Interactive Campus Navigation Kiosk.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php9F2C.tmp
+            [error] => 0
+            [size] => 243947
+        )
+
+)
+
+[2024-11-28 16:37:22] Document type: baptismal
+[2024-11-28 16:37:22] Transaction started
+[2024-11-28 16:37:22] Creating new booking
+[2024-11-28 16:37:22] Created new booking: 5
+[2024-11-28 16:37:22] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/5
+[2024-11-28 16:37:22] Transaction committed successfully
+[2024-11-28 16:37:32] Upload attempt started
+[2024-11-28 16:37:32] User ID: 4
+[2024-11-28 16:37:32] POST data: Array
+(
+    [document_type] => birth_certificate
+)
+
+[2024-11-28 16:37:32] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Findings.pdf
+            [full_path] => Findings.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpC497.tmp
+            [error] => 0
+            [size] => 325028
+        )
+
+)
+
+[2024-11-28 16:37:32] Document type: birth_certificate
+[2024-11-28 16:37:32] Transaction started
+[2024-11-28 16:37:32] Using existing booking ID: 5
+[2024-11-28 16:37:32] Transaction committed successfully
+[2024-11-28 16:37:35] Upload attempt started
+[2024-11-28 16:37:35] User ID: 4
+[2024-11-28 16:37:35] POST data: Array
+(
+    [document_type] => confirmation
+)
+
+[2024-11-28 16:37:35] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Findings.pdf
+            [full_path] => Findings.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpD2C1.tmp
+            [error] => 0
+            [size] => 325028
+        )
+
+)
+
+[2024-11-28 16:37:35] Document type: confirmation
+[2024-11-28 16:37:35] Transaction started
+[2024-11-28 16:37:35] Using existing booking ID: 5
+[2024-11-28 16:37:35] Transaction committed successfully
+[2024-11-28 16:37:38] Upload attempt started
+[2024-11-28 16:37:38] User ID: 4
+[2024-11-28 16:37:38] POST data: Array
+(
+    [document_type] => cenomar
+)
+
+[2024-11-28 16:37:38] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Question.pdf
+            [full_path] => Question.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpDEE7.tmp
+            [error] => 0
+            [size] => 184744
+        )
+
+)
+
+[2024-11-28 16:37:38] Document type: cenomar
+[2024-11-28 16:37:38] Transaction started
+[2024-11-28 16:37:38] Using existing booking ID: 5
+[2024-11-28 16:37:38] Transaction committed successfully
+[2024-11-28 16:37:56] Upload attempt started
+[2024-11-28 16:37:56] User ID: 4
+[2024-11-28 16:37:56] POST data: Array
+(
+    [document_type] => marriage_license
+)
+
+[2024-11-28 16:37:56] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Kylie FHE  8-13-2024.pdf
+            [full_path] => Kylie FHE  8-13-2024.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php243E.tmp
+            [error] => 0
+            [size] => 555301
+        )
+
+)
+
+[2024-11-28 16:37:56] Document type: marriage_license
+[2024-11-28 16:37:56] Transaction started
+[2024-11-28 16:37:56] Using existing booking ID: 5
+[2024-11-28 16:37:56] Transaction committed successfully
