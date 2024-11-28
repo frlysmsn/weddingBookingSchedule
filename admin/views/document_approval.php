@@ -90,7 +90,15 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Documents will be loaded here -->
+                <div class="client-info mb-4">
+                    <!-- Client info will be loaded here -->
+                </div>
+                <div class="documents-list">
+                    <!-- Documents will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -98,44 +106,83 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 <script>
 $(document).ready(function() {
-    $('#documentsTable').DataTable({
+    // Initialize DataTable with simple configuration
+    const table = $('#documentsTable').DataTable({
+        pageLength: 10,
         order: [[2, 'asc']], // Sort by wedding date
-        pageLength: 10
+        responsive: true,
+        language: {
+            emptyTable: "No documents found",
+            search: "Search:",
+            lengthMenu: "Show _MENU_ entries"
+        }
     });
 });
 
 function viewDocuments(userId) {
-    // Load documents into modal
-    $.get('../api/get-user-documents.php', { user_id: userId })
-        .done(function(response) {
-            $('#documentsModal .modal-body').html(response);
-            $('#documentsModal').modal('show');
-        })
-        .fail(function() {
-            Swal.fire('Error!', 'Failed to load documents.', 'error');
-        });
+    // Store user ID in modal data
+    $('#documentsModal').data('userId', userId);
+    
+    // Show loading state
+    $('#documentsModal .modal-body').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Loading documents...</div>');
+    $('#documentsModal').modal('show');
+    
+    // Load documents
+    $.get('../api/get-user-documents.php', { 
+        user_id: userId 
+    })
+    .done(function(response) {
+        $('#documentsModal .modal-body').html(response);
+        // Initialize tooltips
+        $('[data-bs-toggle="tooltip"]').tooltip();
+    })
+    .fail(function(xhr) {
+        $('#documentsModal .modal-body').html('<div class="alert alert-danger">Failed to load documents</div>');
+        console.error('Error loading documents:', xhr.responseText);
+    });
 }
 
 function approveDocument(docId) {
     Swal.fire({
         title: 'Approve Document?',
-        text: 'Are you sure you want to approve this document?',
+        text: 'This will mark the document as approved and notify the client.',
         icon: 'question',
         showCancelButton: true,
-        confirmButtonText: 'Yes, approve it!',
-        cancelButtonText: 'No, cancel'
+        confirmButtonText: 'Yes, approve',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#28a745'
     }).then((result) => {
         if (result.isConfirmed) {
             $.post('../api/approve-document.php', {
                 document_id: docId,
-                action: 'approve'
+                action: 'approve',
+                remarks: ''
             })
             .done(function(response) {
-                Swal.fire('Approved!', 'Document has been approved.', 'success')
-                .then(() => location.reload());
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Approved!',
+                        text: 'Document has been approved and client has been notified.',
+                        timer: 1500
+                    }).then(() => {
+                        // Refresh the documents list in modal
+                        const userId = $('#documentsModal').data('userId');
+                        viewDocuments(userId);
+                        
+                        // Reload the page instead of trying to update DataTable
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(response.error);
+                }
             })
-            .fail(function() {
-                Swal.fire('Error!', 'Failed to approve document.', 'error');
+            .fail(function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: xhr.responseJSON?.error || 'Failed to approve document.'
+                });
             });
         }
     });
@@ -143,12 +190,27 @@ function approveDocument(docId) {
 
 function rejectDocument(docId) {
     Swal.fire({
-        title: 'Reject Document?',
-        text: 'Please provide a reason for rejection:',
-        input: 'text',
+        title: 'Reject Document',
+        html: `
+            <div class="form-group">
+                <label for="rejectionReason" class="text-left">Please provide a reason for rejection:</label>
+                <textarea id="rejectionReason" class="form-control" rows="4" 
+                    placeholder="Enter detailed reason for rejection..."></textarea>
+            </div>
+        `,
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Yes, reject it!'
+        confirmButtonText: 'Reject',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#dc3545',
+        preConfirm: () => {
+            const reason = document.getElementById('rejectionReason').value;
+            if (!reason.trim()) {
+                Swal.showValidationMessage('Please provide a reason for rejection');
+                return false;
+            }
+            return reason;
+        }
     }).then((result) => {
         if (result.isConfirmed) {
             $.post('../api/approve-document.php', {
@@ -157,13 +219,104 @@ function rejectDocument(docId) {
                 remarks: result.value
             })
             .done(function(response) {
-                Swal.fire('Rejected!', 'Document has been rejected.', 'success')
-                .then(() => location.reload());
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Rejected!',
+                        text: 'Document has been rejected and client has been notified.',
+                        timer: 1500
+                    }).then(() => {
+                        // Refresh the documents list in modal
+                        const userId = $('#documentsModal').data('userId');
+                        viewDocuments(userId);
+                        
+                        // Reload the page instead of trying to update DataTable
+                        window.location.reload();
+                    });
+                } else {
+                    throw new Error(response.error);
+                }
             })
-            .fail(function() {
-                Swal.fire('Error!', 'Failed to reject document.', 'error');
+            .fail(function(xhr) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: xhr.responseJSON?.error || 'Failed to reject document.'
+                });
             });
         }
     });
 }
-</script> 
+</script>
+
+<style>
+.documents-list .document-item {
+    border: 1px solid #dee2e6;
+    border-radius: 0.25rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.document-item .document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.document-item .document-info {
+    margin-bottom: 0.5rem;
+}
+
+.document-item .document-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.status-badge {
+    padding: 0.25em 0.6em;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 0.25rem;
+}
+
+.status-pending {
+    background-color: #ffc107;
+    color: #000;
+}
+
+.status-approved {
+    background-color: #28a745;
+    color: #fff;
+}
+
+.status-rejected {
+    background-color: #dc3545;
+    color: #fff;
+}
+
+.remarks {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.5rem;
+}
+
+.dataTables_wrapper .dataTables_processing {
+    background: rgba(255,255,255,0.9);
+    border: 1px solid #ddd;
+    border-radius: 3px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.table-responsive {
+    padding: 1rem;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    min-width: 60px;
+}
+
+.dataTables_wrapper .dataTables_filter input {
+    min-width: 200px;
+}
+</style> 
