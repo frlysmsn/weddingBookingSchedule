@@ -6,78 +6,74 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $db = Database::getInstance()->getConnection();
 
-// Get all pending documents
-$stmt = $db->prepare("
-    SELECT 
-        d.*,
-        u.name as client_name,
-        u.email as client_email,
-        dr.name as document_name
-    FROM documents d
-    JOIN bookings b ON d.booking_id = b.id
-    JOIN users u ON b.user_id = u.id
-    JOIN document_requirements dr ON d.document_type = dr.document_type
+// Get users with pending documents
+$stmt = $db->query("
+    SELECT DISTINCT 
+        u.id,
+        u.name,
+        u.email,
+        b.wedding_date,
+        (SELECT COUNT(*) FROM documents d2 WHERE d2.booking_id = b.id AND d2.status = 'pending') as pending_docs,
+        (SELECT COUNT(*) FROM documents d3 WHERE d3.booking_id = b.id) as total_docs
+    FROM users u
+    JOIN bookings b ON u.id = b.user_id
+    JOIN documents d ON d.booking_id = b.id
     WHERE d.status = 'pending'
-    ORDER BY d.created_at DESC
+    ORDER BY b.wedding_date ASC
 ");
-$stmt->execute();
-$pending_documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="container-fluid">
-    <h2 class="mb-4">Document Approval</h2>
-    
-    <div class="card">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="h3 mb-0">Document Approval</h2>
+    </div>
+
+    <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover" id="documentsTable">
                     <thead>
                         <tr>
-                            <th>Client</th>
-                            <th>Document Type</th>
-                            <th>Submitted Date</th>
-                            <th>Document</th>
+                            <th>Client Name</th>
+                            <th>Email</th>
+                            <th>Wedding Date</th>
+                            <th>Documents Status</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php foreach($pending_documents as $doc): ?>
+                        <?php foreach($users_with_docs as $user): ?>
                             <tr>
+                                <td><?= htmlspecialchars($user['name']) ?></td>
+                                <td><?= htmlspecialchars($user['email']) ?></td>
+                                <td><?= date('M d, Y', strtotime($user['wedding_date'])) ?></td>
                                 <td>
-                                    <?= htmlspecialchars($doc['client_name']) ?>
-                                    <small class="d-block text-muted"><?= $doc['client_email'] ?></small>
+                                    <div class="progress" style="height: 20px;">
+                                        <?php 
+                                        $percentage = ($user['total_docs'] - $user['pending_docs']) / $user['total_docs'] * 100;
+                                        ?>
+                                        <div class="progress-bar bg-success" 
+                                             role="progressbar" 
+                                             style="width: <?= $percentage ?>%"
+                                             aria-valuenow="<?= $percentage ?>" 
+                                             aria-valuemin="0" 
+                                             aria-valuemax="100">
+                                            <?= floor($percentage) ?>%
+                                        </div>
+                                    </div>
+                                    <small class="text-muted">
+                                        <?= $user['total_docs'] - $user['pending_docs'] ?> of <?= $user['total_docs'] ?> approved
+                                    </small>
                                 </td>
-                                <td><?= htmlspecialchars($doc['document_name']) ?></td>
-                                <td><?= date('M d, Y', strtotime($doc['created_at'])) ?></td>
                                 <td>
-                                    <a href="../<?= htmlspecialchars($doc['file_path']) ?>" 
-                                       class="btn btn-sm btn-info" 
-                                       target="_blank">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-success approve-doc" 
-                                            data-id="<?= $doc['id'] ?>"
-                                            data-client="<?= htmlspecialchars($doc['client_name']) ?>">
-                                        <i class="fas fa-check"></i> Approve
-                                    </button>
-                                    <button class="btn btn-sm btn-danger reject-doc" 
-                                            data-id="<?= $doc['id'] ?>"
-                                            data-client="<?= htmlspecialchars($doc['client_name']) ?>">
-                                        <i class="fas fa-times"></i> Reject
+                                    <button class="btn btn-primary btn-sm" 
+                                            onclick="viewDocuments(<?= $user['id'] ?>)">
+                                        <i class="fas fa-file-alt"></i> View Documents
                                     </button>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
-                        <?php if(empty($pending_documents)): ?>
-                            <tr>
-                                <td colspan="5" class="text-center py-4">
-                                    <i class="fas fa-check-circle text-success fa-2x mb-3"></i>
-                                    <p class="mb-0">No pending documents for review</p>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
@@ -85,87 +81,89 @@ $pending_documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
     </div>
 </div>
 
+<!-- Documents Modal -->
+<div class="modal fade" id="documentsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Client Documents</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Documents will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
-    // Handle document approval
-    $('.approve-doc').click(function() {
-        const docId = $(this).data('id');
-        const clientName = $(this).data('client');
-        
-        Swal.fire({
-            title: 'Approve Document?',
-            text: `Approve document for ${clientName}?`,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonColor: '#28a745',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Yes, approve'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('../api/approve-document.php', {
-                    document_id: docId,
-                    action: 'approve'
-                })
-                .done(function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Approved!',
-                        text: 'Document has been approved.'
-                    }).then(() => {
-                        location.reload();
-                    });
-                })
-                .fail(function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: xhr.responseJSON?.message || 'Failed to approve document.'
-                    });
-                });
-            }
-        });
-    });
-
-    // Handle document rejection
-    $('.reject-doc').click(function() {
-        const docId = $(this).data('id');
-        const clientName = $(this).data('client');
-        
-        Swal.fire({
-            title: 'Reject Document?',
-            text: `Please provide a reason for rejection:`,
-            input: 'textarea',
-            inputPlaceholder: 'Enter rejection reason...',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            cancelButtonColor: '#6c757d',
-            confirmButtonText: 'Reject'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('../api/approve-document.php', {
-                    document_id: docId,
-                    action: 'reject',
-                    remarks: result.value
-                })
-                .done(function(response) {
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Rejected',
-                        text: 'Document has been rejected.'
-                    }).then(() => {
-                        location.reload();
-                    });
-                })
-                .fail(function(xhr) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Error!',
-                        text: xhr.responseJSON?.message || 'Failed to reject document.'
-                    });
-                });
-            }
-        });
+    $('#documentsTable').DataTable({
+        order: [[2, 'asc']], // Sort by wedding date
+        pageLength: 10
     });
 });
+
+function viewDocuments(userId) {
+    // Load documents into modal
+    $.get('../api/get-user-documents.php', { user_id: userId })
+        .done(function(response) {
+            $('#documentsModal .modal-body').html(response);
+            $('#documentsModal').modal('show');
+        })
+        .fail(function() {
+            Swal.fire('Error!', 'Failed to load documents.', 'error');
+        });
+}
+
+function approveDocument(docId) {
+    Swal.fire({
+        title: 'Approve Document?',
+        text: 'Are you sure you want to approve this document?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, approve it!',
+        cancelButtonText: 'No, cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('../api/approve-document.php', {
+                document_id: docId,
+                action: 'approve'
+            })
+            .done(function(response) {
+                Swal.fire('Approved!', 'Document has been approved.', 'success')
+                .then(() => location.reload());
+            })
+            .fail(function() {
+                Swal.fire('Error!', 'Failed to approve document.', 'error');
+            });
+        }
+    });
+}
+
+function rejectDocument(docId) {
+    Swal.fire({
+        title: 'Reject Document?',
+        text: 'Please provide a reason for rejection:',
+        input: 'text',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes, reject it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            $.post('../api/approve-document.php', {
+                document_id: docId,
+                action: 'reject',
+                remarks: result.value
+            })
+            .done(function(response) {
+                Swal.fire('Rejected!', 'Document has been rejected.', 'success')
+                .then(() => location.reload());
+            })
+            .fail(function() {
+                Swal.fire('Error!', 'Failed to reject document.', 'error');
+            });
+        }
+    });
+}
 </script> 
