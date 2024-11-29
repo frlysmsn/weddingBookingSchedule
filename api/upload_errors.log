@@ -306,3 +306,156 @@
 [2024-11-28 16:37:56] Transaction started
 [2024-11-28 16:37:56] Using existing booking ID: 5
 [2024-11-28 16:37:56] Transaction committed successfully
+[2024-11-28 17:45:02] Upload attempt started
+[2024-11-28 17:45:02] User ID: 5
+[2024-11-28 17:45:02] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-11-28 17:45:02] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Kylie FHE  8-13-2024.pdf
+            [full_path] => Kylie FHE  8-13-2024.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php93E9.tmp
+            [error] => 0
+            [size] => 555301
+        )
+
+)
+
+[2024-11-28 17:45:02] Document type: baptismal
+[2024-11-28 17:45:02] Transaction started
+[2024-11-28 17:45:02] Using existing booking ID: 6
+[2024-11-28 17:45:02] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/6
+[2024-11-28 17:45:02] Transaction committed successfully
+[2024-11-29 04:50:03] Upload attempt started
+[2024-11-29 04:50:03] User ID: 6
+[2024-11-29 04:50:03] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-11-29 04:50:03] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => 133-139, Tesma0805,IJEAST.pdf
+            [full_path] => 133-139, Tesma0805,IJEAST.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php6A57.tmp
+            [error] => 0
+            [size] => 433855
+        )
+
+)
+
+[2024-11-29 04:50:03] Document type: baptismal
+[2024-11-29 04:50:03] Transaction started
+[2024-11-29 04:50:03] Creating new booking
+[2024-11-29 04:50:03] Created new booking: 7
+[2024-11-29 04:50:03] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/7
+[2024-11-29 04:50:03] Transaction committed successfully
+[2024-11-29 04:50:22] Upload attempt started
+[2024-11-29 04:50:22] User ID: 6
+[2024-11-29 04:50:22] POST data: Array
+(
+    [document_type] => birth_certificate
+)
+
+[2024-11-29 04:50:22] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo-CCNA313-Midterm Examination.pdf
+            [full_path] => REManzo-CCNA313-Midterm Examination.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpB22F.tmp
+            [error] => 0
+            [size] => 270502
+        )
+
+)
+
+[2024-11-29 04:50:22] Document type: birth_certificate
+[2024-11-29 04:50:22] Transaction started
+[2024-11-29 04:50:22] Using existing booking ID: 7
+[2024-11-29 04:50:22] Transaction committed successfully
+[2024-11-29 04:50:29] Upload attempt started
+[2024-11-29 04:50:29] User ID: 6
+[2024-11-29 04:50:29] POST data: Array
+(
+    [document_type] => confirmation
+)
+
+[2024-11-29 04:50:29] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => SulibranCCNA313-Midterm Examination.pdf
+            [full_path] => SulibranCCNA313-Midterm Examination.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpD085.tmp
+            [error] => 0
+            [size] => 269640
+        )
+
+)
+
+[2024-11-29 04:50:29] Document type: confirmation
+[2024-11-29 04:50:29] Transaction started
+[2024-11-29 04:50:29] Using existing booking ID: 7
+[2024-11-29 04:50:29] Transaction committed successfully
+[2024-11-29 04:50:38] Upload attempt started
+[2024-11-29 04:50:38] User ID: 6
+[2024-11-29 04:50:38] POST data: Array
+(
+    [document_type] => cenomar
+)
+
+[2024-11-29 04:50:38] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Volume7_Issue3_Paper3_2023.pdf
+            [full_path] => Volume7_Issue3_Paper3_2023.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpF266.tmp
+            [error] => 0
+            [size] => 334630
+        )
+
+)
+
+[2024-11-29 04:50:38] Document type: cenomar
+[2024-11-29 04:50:38] Transaction started
+[2024-11-29 04:50:38] Using existing booking ID: 7
+[2024-11-29 04:50:38] Transaction committed successfully
+[2024-11-29 04:50:52] Upload attempt started
+[2024-11-29 04:50:52] User ID: 6
+[2024-11-29 04:50:52] POST data: Array
+(
+    [document_type] => marriage_license
+)
+
+[2024-11-29 04:50:52] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => STOREDPROCEDURES.pdf
+            [full_path] => STOREDPROCEDURES.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php27BF.tmp
+            [error] => 0
+            [size] => 151007
+        )
+
+)
+
+[2024-11-29 04:50:52] Document type: marriage_license
+[2024-11-29 04:50:52] Transaction started
+[2024-11-29 04:50:52] Using existing booking ID: 7
+[2024-11-29 04:50:52] Transaction committed successfully

@@ -14,16 +14,36 @@ $stmt = $db->prepare("
 $stmt->execute([$_GET['booking_id'], $_SESSION['user_id']]);
 $booking = $stmt->fetch(PDO::FETCH_ASSOC);
 
-// Get required documents checklist
+// Required documents with descriptions
 $required_docs = [
-    'baptismal' => 'Baptismal Certificate',
-    'confirmation' => 'Confirmation Certificate',
-    'marriage_license' => 'Marriage License',
-    'birth_certificate' => 'Birth Certificate',
-    'cenomar' => 'CENOMAR'
+    'baptismal' => [
+        'name' => 'Baptismal Certificate',
+        'description' => 'Recent copy with annotation for marriage',
+        'required' => true
+    ],
+    'confirmation' => [
+        'name' => 'Confirmation Certificate',
+        'description' => 'Must be authenticated',
+        'required' => true
+    ],
+    'marriage_license' => [
+        'name' => 'Marriage License',
+        'description' => 'Valid government-issued license',
+        'required' => true
+    ],
+    'birth_certificate' => [
+        'name' => 'Birth Certificate',
+        'description' => 'PSA authenticated copy',
+        'required' => true
+    ],
+    'cenomar' => [
+        'name' => 'CENOMAR',
+        'description' => 'Certificate of No Marriage Record from PSA',
+        'required' => true
+    ]
 ];
 
-// Check which documents are already uploaded
+// Check uploaded documents
 $stmt = $db->prepare("
     SELECT document_type, status 
     FROM documents 
@@ -62,21 +82,32 @@ $uploaded_docs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
 
     <div class="documents-checklist card">
         <h3>Required Documents</h3>
+        <p class="text-muted">Please upload all required documents to proceed with your booking.</p>
+        
         <div class="checklist-grid">
-            <?php foreach($required_docs as $key => $doc): ?>
+            <?php foreach($required_docs as $doc_key => $doc): ?>
                 <div class="checklist-item">
-                    <i class="fas fa-<?= isset($uploaded_docs[$key]) ? 'check text-success' : 'times text-danger' ?>"></i>
-                    <span><?= $doc ?></span>
-                    <?php if(!isset($uploaded_docs[$key])): ?>
-                        <button onclick="location.href='index.php?page=documents'" 
-                                class="btn btn-sm btn-primary">
-                            Upload
-                        </button>
-                    <?php else: ?>
-                        <span class="status-badge status-<?= $uploaded_docs[$key] ?>">
-                            <?= ucfirst($uploaded_docs[$key]) ?>
-                        </span>
-                    <?php endif; ?>
+                    <div class="doc-status">
+                        <?php if(isset($uploaded_docs[$doc_key])): ?>
+                            <i class="fas fa-check-circle text-success"></i>
+                        <?php else: ?>
+                            <i class="fas fa-exclamation-circle text-warning"></i>
+                        <?php endif; ?>
+                    </div>
+                    <div class="doc-info">
+                        <h4><?= $doc['name'] ?></h4>
+                        <p><?= $doc['description'] ?></p>
+                        <?php if(isset($uploaded_docs[$doc_key])): ?>
+                            <span class="status-badge status-<?= $uploaded_docs[$doc_key] ?>">
+                                <?= ucfirst($uploaded_docs[$doc_key]) ?>
+                            </span>
+                        <?php else: ?>
+                            <button onclick="location.href='index.php?page=documents&booking_id=<?= $booking['id'] ?>'" 
+                                    class="btn btn-sm btn-primary">
+                                Upload Now
+                            </button>
+                        <?php endif; ?>
+                    </div>
                 </div>
             <?php endforeach; ?>
         </div>
@@ -85,10 +116,14 @@ $uploaded_docs = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
     <div class="next-steps card">
         <h3>Next Steps</h3>
         <ol class="steps-list">
-            <li>Upload all required documents</li>
-            <li>Wait for admin approval</li>
-            <li>Schedule pre-wedding interview</li>
-            <li>Complete payment (if required)</li>
+            <li class="<?= count($uploaded_docs) === count($required_docs) ? 'completed' : 'pending' ?>">
+                Upload all required documents
+            </li>
+            <li class="<?= $booking['status'] === 'approved' ? 'completed' : 'pending' ?>">
+                Wait for admin approval
+            </li>
+            <li class="pending">Schedule pre-wedding interview</li>
+            <li class="pending">Complete payment</li>
         </ol>
     </div>
 
