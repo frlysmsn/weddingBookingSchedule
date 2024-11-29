@@ -1,113 +1,121 @@
 <?php
-$booking_id = $_GET['booking_id'];
+if(!isset($_SESSION['user_id'])) {
+    header('Location: index.php?page=login');
+    exit;
+}
+
 $db = Database::getInstance()->getConnection();
 
-// Get booking details with status history
-$stmt = $db->prepare("
-    SELECT b.*, 
-           bs.status,
-           bs.created_at as status_date,
-           bs.remarks,
-           u.name as updated_by
-    FROM bookings b
-    LEFT JOIN booking_status_history bs ON b.id = bs.booking_id
-    LEFT JOIN users u ON bs.updated_by = u.id
-    WHERE b.id = ? AND b.user_id = ?
-    ORDER BY bs.created_at DESC
-");
-$stmt->execute([$booking_id, $_SESSION['user_id']]);
-$status_history = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-// Get document status
-$stmt = $db->prepare("
-    SELECT document_type, status, uploaded_at, reviewed_at
-    FROM documents
-    WHERE user_id = ?
-");
+// Fetch all bookings for the current user
+$query = "SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC";
+$stmt = $db->prepare($query);
 $stmt->execute([$_SESSION['user_id']]);
-$documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
-<div class="status-tracking">
-    <div class="timeline">
-        <?php foreach($status_history as $status): ?>
-            <div class="timeline-item">
-                <div class="timeline-marker"></div>
-                <div class="timeline-content">
-                    <h4><?= ucfirst($status['status']) ?></h4>
-                    <p class="timestamp">
-                        <?= date('M d, Y h:i A', strtotime($status['status_date'])) ?>
-                    </p>
-                    <?php if($status['remarks']): ?>
-                        <p class="remarks"><?= $status['remarks'] ?></p>
-                    <?php endif; ?>
-                    <p class="updated-by">Updated by: <?= $status['updated_by'] ?></p>
+<div class="container-fluid">
+    <h1 class="h3 mb-4 text-gray-800">My Wedding Bookings</h1>
+
+    <?php if(empty($bookings)): ?>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> You haven't made any wedding bookings yet.
+        </div>
+    <?php else: ?>
+        <?php foreach($bookings as $booking): ?>
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        Booking #<?= $booking['id'] ?>
+                        <span class="badge bg-<?= getStatusBadgeClass($booking['status']) ?> ms-2">
+                            <?= ucfirst($booking['status']) ?>
+                        </span>
+                    </h5>
+                    <small class="text-muted">
+                        Submitted: <?= date('F j, Y g:i A', strtotime($booking['created_at'])) ?>
+                    </small>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <!-- Wedding Details -->
+                        <div class="col-md-4">
+                            <h6 class="border-bottom pb-2">Wedding Details</h6>
+                            <p><strong>Date:</strong> <?= date('F j, Y', strtotime($booking['wedding_date'])) ?></p>
+                            <p><strong>Time:</strong> <?= $booking['preferred_time'] ?></p>
+                            <p><strong>Contact:</strong> <?= $booking['contact_number'] ?></p>
+                            <p><strong>Email:</strong> <?= $booking['email'] ?></p>
+                        </div>
+
+                        <!-- Bride Details -->
+                        <div class="col-md-4">
+                            <h6 class="border-bottom pb-2">Bride's Information</h6>
+                            <p><strong>Name:</strong> <?= $booking['bride_name'] ?></p>
+                            <p><strong>Birth Date:</strong> <?= date('F j, Y', strtotime($booking['bride_dob'])) ?></p>
+                            <p><strong>Birthplace:</strong> <?= $booking['bride_birthplace'] ?></p>
+                            <p><strong>Mother's Name:</strong> <?= $booking['bride_mother'] ?></p>
+                            <p><strong>Father's Name:</strong> <?= $booking['bride_father'] ?></p>
+                            <p><strong>Pre-nuptial:</strong> 
+                                <span class="badge bg-<?= $booking['bride_prenup'] === 'yes' ? 'success' : 'danger' ?>">
+                                    <?= strtoupper($booking['bride_prenup']) ?>
+                                </span>
+                            </p>
+                            <p><strong>Pre-cana:</strong> 
+                                <span class="badge bg-<?= $booking['bride_precana'] === 'yes' ? 'success' : 'danger' ?>">
+                                    <?= strtoupper($booking['bride_precana']) ?>
+                                </span>
+                            </p>
+                        </div>
+
+                        <!-- Groom Details -->
+                        <div class="col-md-4">
+                            <h6 class="border-bottom pb-2">Groom's Information</h6>
+                            <p><strong>Name:</strong> <?= $booking['groom_name'] ?></p>
+                            <p><strong>Birth Date:</strong> <?= date('F j, Y', strtotime($booking['groom_dob'])) ?></p>
+                            <p><strong>Birthplace:</strong> <?= $booking['groom_birthplace'] ?></p>
+                            <p><strong>Mother's Name:</strong> <?= $booking['groom_mother'] ?></p>
+                            <p><strong>Father's Name:</strong> <?= $booking['groom_father'] ?></p>
+                            <p><strong>Pre-nuptial:</strong> 
+                                <span class="badge bg-<?= $booking['groom_prenup'] === 'yes' ? 'success' : 'danger' ?>">
+                                    <?= strtoupper($booking['groom_prenup']) ?>
+                                </span>
+                            </p>
+                            <p><strong>Pre-cana:</strong> 
+                                <span class="badge bg-<?= $booking['groom_precana'] === 'yes' ? 'success' : 'danger' ?>">
+                                    <?= strtoupper($booking['groom_precana']) ?>
+                                </span>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         <?php endforeach; ?>
-    </div>
-
-    <div class="documents-status">
-        <h3>Documents Status</h3>
-        <div class="documents-grid">
-            <?php foreach($documents as $doc): ?>
-                <div class="document-status-item">
-                    <h4><?= ucfirst(str_replace('_', ' ', $doc['document_type'])) ?></h4>
-                    <span class="status-badge status-<?= $doc['status'] ?>">
-                        <?= ucfirst($doc['status']) ?>
-                    </span>
-                    <p>Uploaded: <?= date('M d, Y', strtotime($doc['uploaded_at'])) ?></p>
-                    <?php if($doc['reviewed_at']): ?>
-                        <p>Reviewed: <?= date('M d, Y', strtotime($doc['reviewed_at'])) ?></p>
-                    <?php endif; ?>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    </div>
+    <?php endif; ?>
 </div>
 
+<?php
+function getStatusBadgeClass($status) {
+    switch($status) {
+        case 'pending':
+            return 'warning';
+        case 'approved':
+            return 'success';
+        case 'rejected':
+            return 'danger';
+        case 'cancelled':
+            return 'secondary';
+        default:
+            return 'primary';
+    }
+}
+?>
+
 <style>
-.timeline {
-    position: relative;
-    padding: 2rem 0;
+.card {
+    transition: transform 0.2s;
 }
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: 50px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #dee2e6;
+.card:hover {
+    transform: translateY(-5px);
 }
-
-.timeline-item {
-    position: relative;
-    padding-left: 70px;
-    margin-bottom: 2rem;
-}
-
-.timeline-marker {
-    position: absolute;
-    left: 42px;
-    width: 16px;
-    height: 16px;
-    border-radius: 50%;
-    background: #007bff;
-    border: 2px solid #fff;
-}
-
-.documents-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 1rem;
-}
-
-.document-status-item {
-    background: white;
-    padding: 1rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.badge {
+    font-size: 0.8em;
 }
 </style> 

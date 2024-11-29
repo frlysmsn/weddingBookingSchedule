@@ -26,71 +26,74 @@ $pending_bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <h2 class="mb-4">Wedding Bookings</h2>
     
     <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Wedding Bookings Management</h5>
+        </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
+            <table id="bookingsTable" class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Booking ID</th>
+                        <th>Couple Names</th>
+                        <th>Wedding Date</th>
+                        <th>Status</th>
+                        <th>Documents</th>
+                        <th>Wedding Details</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach($pending_bookings as $booking): ?>
                         <tr>
-                            <th>Client</th>
-                            <th>Wedding Date</th>
-                            <th>Time</th>
-                            <th>Couple</th>
-                            <th>Documents</th>
-                            <th>Status</th>
-                            <th>Actions</th>
+                            <td><?= $booking['id'] ?></td>
+                            <td><?= htmlspecialchars($booking['client_name']) ?></td>
+                            <td><?= date('F d, Y', strtotime($booking['wedding_date'])) ?></td>
+                            <td><span class="badge bg-<?= $booking['status'] === 'approved' ? 'success' : 'warning' ?>"><?= ucwords(str_replace('_', ' ', $booking['status'])) ?></span></td>
+                            <td>
+                                <?php if($booking['approved_docs'] >= 4): ?>
+                                    <span class="badge bg-success">Approved</span>
+                                <?php else: ?>
+                                    <span class="badge bg-warning">Pending</span>
+                                <?php endif; ?>
+                            </td>
+                            <td>
+                                <button class="btn btn-sm btn-info view-details" 
+                                        data-id="<?= $booking['id'] ?>"
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#weddingDetailsModal">
+                                    <i class="fas fa-eye"></i> View
+                                </button>
+                            </td>
+                            <td>
+                                <?php if($booking['status'] == 'waiting_for_confirmation'): ?>
+                                    <button class="btn btn-sm btn-success approve-booking" 
+                                            data-id="<?= $booking['id'] ?>">
+                                        <i class="fas fa-check"></i> Approve
+                                    </button>
+                                    <button class="btn btn-sm btn-danger reject-booking" 
+                                            data-id="<?= $booking['id'] ?>">
+                                        <i class="fas fa-times"></i> Reject
+                                    </button>
+                                <?php endif; ?>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach($pending_bookings as $booking): ?>
-                            <tr>
-                                <td>
-                                    <?= htmlspecialchars($booking['client_name']) ?>
-                                    <small class="d-block text-muted"><?= $booking['client_email'] ?></small>
-                                </td>
-                                <td><?= date('M d, Y', strtotime($booking['wedding_date'])) ?></td>
-                                <td><?= date('h:i A', strtotime($booking['preferred_time'])) ?></td>
-                                <td>
-                                    <strong>Groom:</strong> <?= htmlspecialchars($booking['groom_name']) ?><br>
-                                    <strong>Bride:</strong> <?= htmlspecialchars($booking['bride_name']) ?>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?= $booking['approved_docs'] >= 4 ? 'success' : 'warning' ?>">
-                                        <?= $booking['approved_docs'] ?>/4 Approved
-                                    </span>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?= $booking['status'] === 'approved' ? 'success' : 'warning' ?>">
-                                        <?= ucfirst($booking['status']) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <?php if($booking['approved_docs'] >= 4): ?>
-                                        <button class="btn btn-sm btn-success approve-booking" 
-                                                data-id="<?= $booking['id'] ?>"
-                                                data-client="<?= htmlspecialchars($booking['client_name']) ?>"
-                                                data-email="<?= $booking['client_email'] ?>"
-                                                data-date="<?= date('M d, Y', strtotime($booking['wedding_date'])) ?>"
-                                                data-time="<?= date('h:i A', strtotime($booking['preferred_time'])) ?>">
-                                            <i class="fas fa-check"></i> Approve
-                                        </button>
-                                    <?php else: ?>
-                                        <button class="btn btn-sm btn-secondary" disabled>
-                                            <i class="fas fa-clock"></i> Waiting for Documents
-                                        </button>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                        <?php if(empty($pending_bookings)): ?>
-                            <tr>
-                                <td colspan="7" class="text-center py-4">
-                                    <i class="fas fa-calendar-check text-success fa-2x mb-3"></i>
-                                    <p class="mb-0">No pending bookings</p>
-                                </td>
-                            </tr>
-                        <?php endif; ?>
-                    </tbody>
-                </table>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Wedding Details Modal -->
+<div class="modal fade" id="weddingDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Wedding Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Details will be loaded here -->
             </div>
         </div>
     </div>

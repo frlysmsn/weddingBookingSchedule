@@ -23,12 +23,8 @@
                     <?php if($_SESSION['role'] == 'admin'): ?>
                         <a href="index.php?page=admin-dashboard">Dashboard</a>
                     <?php else: ?>
-                        <a href="index.php?page=client-dashboard">Dashboard</a>
                     <?php endif; ?>
-                    <a href="logout.php">Logout</a>
                 <?php else: ?>
-                    <a href="index.php?page=login">Login</a>
-                    <a href="index.php?page=register">Register</a>
                 <?php endif; ?>
             </div>
         </div>

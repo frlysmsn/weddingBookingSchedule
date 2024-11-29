@@ -65,217 +65,668 @@ if ($doc_status['total_docs'] > 0) {
     <div class="alert alert-warning">
         <h5><i class="fas fa-exclamation-triangle"></i> Document Requirements</h5>
         <p>Please complete the document requirements before proceeding with the wedding details. 
-           Current progress: <?= $doc_status['approved_docs'] ?>/<?= $doc_status['total_docs'] ?> documents approved.</p>
+       <b><p style="color: red;"> Note: Wait for the staff/admin to approve in order to proceed to the next step.</p></b>
+           Current progress: <b> <?= $doc_status['approved_docs'] ?>/<?= $doc_status['total_docs'] ?></b> documents approved.</p>
     </div>
 <?php else: ?>
-    <div class="booking-container">
-        <div class="card shadow-sm">
-            <div class="card-body">
-                <h3 class="card-title mb-4">Wedding Details</h3>
-                
-                <form id="bookingForm" class="needs-validation" novalidate>
-                    <!-- Bride Information -->
-                    <div class="form-section mb-4">
-                        <h4 class="text-primary mb-3">Bride's Information</h4>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" name="bride_name" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date of Birth *</label>
-                                <input type="date" name="bride_dob" class="form-control" required>
-                            </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Birthplace *</label>
-                                <input type="text" name="bride_birthplace" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Mother's Maiden Name *</label>
-                                <input type="text" name="bride_mother" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Father's Name *</label>
-                                <input type="text" name="bride_father" class="form-control" required>
-                            </div>
+    <div class="row">
+        <!-- Calendar Column -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Wedding Calendar</h5>
+                </div>
+                <div class="card-body">
+                    <div id="weddingCalendar"></div>
+                    <div class="mt-3">
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="badge bg-danger me-2">&nbsp;</span>
+                            <small>Booked Date</small>
                         </div>
-                        <div class="mt-3">
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" name="bride_interview" required>
-                                <label class="form-check-label">Already Interviewed for PRE-NUPTIAL *</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="bride_seminar" required>
-                                <label class="form-check-label">Has Seminar for PRE-CANA *</label>
-                            </div>
+                        <div class="d-flex align-items-center">
+                            <span class="badge bg-success me-2">&nbsp;</span>
+                            <small>Available Date</small>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Groom Information -->
-                    <div class="form-section mb-4">
-                        <h4 class="text-primary mb-3">Groom's Information</h4>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Full Name *</label>
-                                <input type="text" name="groom_name" class="form-control" required>
+        <!-- Booking Form Column -->
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Wedding Booking Form</h5>
+                </div>
+                <div class="card-body">
+                    <form id="weddingBookingForm">
+                        <!-- Bride's Information -->
+                        <h6 class="mb-3">Bride's Information</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>First Name *</label>
+                                    <input type="text" class="form-control" name="bride_fname" required>
+                                </div>
                             </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date of Birth *</label>
-                                <input type="date" name="groom_dob" class="form-control" required>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input type="text" class="form-control" name="bride_mname">
+                                </div>
                             </div>
-                            <div class="col-md-12">
-                                <label class="form-label">Birthplace *</label>
-                                <input type="text" name="groom_birthplace" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Mother's Maiden Name *</label>
-                                <input type="text" name="groom_mother" class="form-control" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Father's Name *</label>
-                                <input type="text" name="groom_father" class="form-control" required>
-                            </div>
-                        </div>
-                        <div class="mt-3">
-                            <div class="form-check mb-2">
-                                <input type="checkbox" class="form-check-input" name="groom_interview" required>
-                                <label class="form-check-label">Already Interviewed for PRE-NUPTIAL *</label>
-                            </div>
-                            <div class="form-check">
-                                <input type="checkbox" class="form-check-input" name="groom_seminar" required>
-                                <label class="form-check-label">Has Seminar for PRE-CANA *</label>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Last Name *</label>
+                                    <input type="text" class="form-control" name="bride_lname" required>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Wedding Date Selection -->
-                    <div class="form-section mb-4">
-                        <h4 class="text-primary mb-3">Select Wedding Date *</h4>
-                        <div id="weddingCalendar"></div>
-                        <input type="hidden" name="wedding_date" id="selected_date" required>
-                        <div id="selectedDateDisplay" class="mt-3 alert alert-info d-none">
-                            <i class="fas fa-calendar-check"></i> 
-                            <span id="selectedDateText"></span>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Date of Birth *</label>
+                                    <input type="date" class="form-control" name="bride_dob" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Birthplace *</label>
+                                    <input type="text" class="form-control" name="bride_birthplace" required>
+                                </div>
+                            </div>
                         </div>
-                        <div id="dateValidationMessage" class="mt-2 text-danger small d-none">
-                            <i class="fas fa-exclamation-circle"></i> Please select a wedding date
-                        </div>
-                    </div>
 
-                    <div class="d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-secondary" onclick="history.back()">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Proceed to Confirmation</button>
-                    </div>
-                </form>
+                        <!-- Add these missing fields for Bride -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mother's Maiden Name *</label>
+                                    <input type="text" class="form-control" name="bride_mother" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Father's Name *</label>
+                                    <input type="text" class="form-control" name="bride_father" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PRE-NUPTIAL Interview *</label>
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="bride_prenup" value="yes" required>
+                                            <label class="form-check-label">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="bride_prenup" value="no" required>
+                                            <label class="form-check-label">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PRE-CANA Seminar *</label>
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="bride_precana" value="yes" required>
+                                            <label class="form-check-label">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="bride_precana" value="no" required>
+                                            <label class="form-check-label">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Groom's Information -->
+                        <h6 class="mb-3">Groom's Information</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>First Name *</label>
+                                    <input type="text" class="form-control" name="groom_fname" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input type="text" class="form-control" name="groom_mname">
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-group">
+                                    <label>Last Name *</label>
+                                    <input type="text" class="form-control" name="groom_lname" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Date of Birth *</label>
+                                    <input type="date" class="form-control" name="groom_dob" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Birthplace *</label>
+                                    <input type="text" class="form-control" name="groom_birthplace" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add these missing fields for Groom -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Mother's Maiden Name *</label>
+                                    <input type="text" class="form-control" name="groom_mother" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Father's Name *</label>
+                                    <input type="text" class="form-control" name="groom_father" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PRE-NUPTIAL Interview *</label>
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="groom_prenup" value="yes" required>
+                                            <label class="form-check-label">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="groom_prenup" value="no" required>
+                                            <label class="form-check-label">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>PRE-CANA Seminar *</label>
+                                    <div class="mt-2">
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="groom_precana" value="yes" required>
+                                            <label class="form-check-label">Yes</label>
+                                        </div>
+                                        <div class="form-check form-check-inline">
+                                            <input class="form-check-input" type="radio" name="groom_precana" value="no" required>
+                                            <label class="form-check-label">No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Keep your existing Wedding Details section -->
+                        <hr class="my-4">
+                        <h6 class="mb-3">Wedding Details</h6>
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Preferred Wedding Date</label>
+                                    <i><p>Note: Check the Wedding Calendar for available dates.</p></i>
+                                    <input type="date" class="form-control" name="wedding_date" id="wedding_date" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Preferred Time</label>
+                                    <select class="form-control" name="preferred_time" required>
+                                        <option value="">Select Time Slot</option>
+                                        <option value="08:00-09:00">8:00 AM - 9:00 AM</option>
+                                        <option value="09:00-10:00">9:00 AM - 10:00 AM</option>
+                                        <option value="13:00-14:00">1:00 PM - 2:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Contact Details -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Contact Number</label>
+                                    <input type="tel" class="form-control" name="contact_number" required>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Email Address</label>
+                                    <input type="email" class="form-control" name="email" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="text-end mt-4">
+                            <button type="button" class="btn btn-success" id="proceedToConfirmation">
+                                Proceed to Confirmation
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Modal -->
+    <div class="modal fade" id="confirmationModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title">
+                        <i class="fas fa-clipboard-check me-2"></i>
+                        Wedding Booking Confirmation
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Couple's Information -->
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-user-couple me-2"></i>
+                                Couple's Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <!-- Bride's Details -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-female me-2"></i>
+                                        Bride's Details
+                                    </h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Complete Name:</th>
+                                            <td><span id="confirm-bride-name"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date of Birth:</th>
+                                            <td><span id="confirm-bride-dob"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Birthplace:</th>
+                                            <td><span id="confirm-bride-birthplace"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Mother's Name:</th>
+                                            <td><span id="confirm-bride-mother"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Father's Name:</th>
+                                            <td><span id="confirm-bride-father"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-light p-2 rounded">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <small class="d-block"><strong>PRE-NUPTIAL Interview:</strong> 
+                                                    <span class="badge bg-secondary" id="confirm-bride-prenup"></span>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <small class="d-block"><strong>PRE-CANA Seminar:</strong> 
+                                                    <span class="badge bg-secondary" id="confirm-bride-precana"></span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Groom's Details -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="fas fa-male me-2"></i>
+                                        Groom's Details
+                                    </h6>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Complete Name:</th>
+                                            <td><span id="confirm-groom-name"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Date of Birth:</th>
+                                            <td><span id="confirm-groom-dob"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Birthplace:</th>
+                                            <td><span id="confirm-groom-birthplace"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Mother's Name:</th>
+                                            <td><span id="confirm-groom-mother"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Father's Name:</th>
+                                            <td><span id="confirm-groom-father"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-12">
+                                    <div class="bg-light p-2 rounded">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <small class="d-block"><strong>PRE-NUPTIAL Interview:</strong> 
+                                                    <span class="badge bg-secondary" id="confirm-groom-prenup"></span>
+                                                </small>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <small class="d-block"><strong>PRE-CANA Seminar:</strong> 
+                                                    <span class="badge bg-secondary" id="confirm-groom-precana"></span>
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Wedding Details -->
+                    <div class="card">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">
+                                <i class="fas fa-calendar-alt me-2"></i>
+                                Wedding Schedule & Contact Information
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Wedding Date:</th>
+                                            <td><span id="confirm-wedding-date" class="text-primary fw-bold"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Wedding Time:</th>
+                                            <td><span id="confirm-wedding-time" class="text-primary fw-bold"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-sm">
+                                        <tr>
+                                            <th width="40%">Contact Number:</th>
+                                            <td><span id="confirm-contact"></span></td>
+                                        </tr>
+                                        <tr>
+                                            <th>Email Address:</th>
+                                            <td><span id="confirm-email"></span></td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-4 mb-0">
+                        <div class="d-flex">
+                            <div class="me-3">
+                                <i class="fas fa-info-circle fa-2x"></i>
+                            </div>
+                            <div>
+                                <h6 class="alert-heading">Please Review Your Details</h6>
+                                <p class="mb-0">Carefully check all information before confirming. Once submitted, your booking will be reviewed by the admin for approval.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="fas fa-edit me-2"></i>Edit Details
+                    </button>
+                    <button type="button" class="btn btn-success" id="confirmBookingBtn">
+                        <i class="fas fa-check-circle me-2"></i>Confirm Booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    $(document).ready(function() {
+        // Initialize FullCalendar
+        const calendar = new FullCalendar.Calendar(document.getElementById('weddingCalendar'), {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            selectConstraint: {
+                start: new Date(), // Can't select dates before today
+            },
+            events: 'ajax/get_booked_dates.php', // Endpoint to get booked dates
+            select: function(info) {
+                const selectedDate = info.startStr;
+                const dateInput = $('#wedding_date');
+                dateInput.val(selectedDate);
+                
+                // Highlight the selected date
+                $('.fc-day').removeClass('selected');
+                $(info.dayEl).addClass('selected');
+            },
+            eventDidMount: function(info) {
+                // Add tooltip showing it's booked
+                if(info.event.title === 'Booked') {
+                    $(info.el).tooltip({
+                        title: 'This date is already booked',
+                        placement: 'top'
+                    });
+                }
+            }
+        });
+        calendar.render();
+
+        // When "Proceed to Confirmation" is clicked
+        $('#proceedToConfirmation').click(function(e) {
+            e.preventDefault();
+            
+            // Check form validity
+            if (!$('#weddingBookingForm')[0].checkValidity()) {
+                $('#weddingBookingForm')[0].reportValidity();
+                return;
+            }
+
+            // Update modal with form data
+            updateConfirmationModal();
+            $('#confirmationModal').modal('show');
+        });
+
+        // When "Confirm Booking" in modal is clicked
+        $('#confirmBookingBtn').click(function(e) {
+            e.preventDefault();
+            
+            $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i> Processing...');
+            
+            let formData = new FormData($('#weddingBookingForm')[0]);
+            
+            // Debug: Log form data
+            console.log('Sending form data:', Object.fromEntries(formData));
+            
+            $.ajax({
+                url: 'ajax/confirm_booking.php',
+                type: 'POST',
+                data: formData,
+                processData: false,
+                contentType: false,
+                dataType: 'json',
+                success: function(response) {
+                    console.log('Success Response:', response);
+                    
+                    if (response && response.status === 'success') {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            text: response.message || 'Booking confirmed successfully',
+                            confirmButtonColor: '#4e73df'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = 'index.php?page=booking_status';
+                            }
+                        });
+                    } else {
+                        throw new Error(response.message || 'Invalid response format');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.group('AJAX Error Details');
+                    console.log('Status:', status);
+                    console.log('Error:', error);
+                    console.log('Response Text:', xhr.responseText);
+                    console.log('URL:', this.url);
+                    try {
+                        console.log('Parsed Response:', JSON.parse(xhr.responseText));
+                    } catch (e) {
+                        console.log('Raw Response (not JSON):', xhr.responseText);
+                    }
+                    console.groupEnd();
+                    
+                    let errorMessage = 'Failed to connect to the server. Please try again.';
+                    
+                    if (xhr.responseText) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.message) {
+                                errorMessage = response.message;
+                            }
+                            if (response.debug) {
+                                console.error('Debug Info:', response.debug);
+                            }
+                        } catch (e) {
+                            console.error('Error parsing response:', e);
+                            errorMessage = xhr.responseText;
+                        }
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'System Error',
+                        text: errorMessage,
+                        confirmButtonColor: '#4e73df'
+                    });
+                },
+                complete: function() {
+                    $('#confirmBookingBtn').prop('disabled', false).html('Confirm Booking');
+                }
+            });
+        });
+
+        // Add form validation
+        $('#weddingBookingForm').on('submit', function(e) {
+            e.preventDefault();
+            // Validate required fields
+            let isValid = true;
+            $(this).find('[required]').each(function() {
+                if (!$(this).val()) {
+                    isValid = false;
+                    $(this).addClass('is-invalid');
+                } else {
+                    $(this).removeClass('is-invalid');
+                }
+            });
+            
+            if (!isValid) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Required Fields',
+                    text: 'Please fill in all required fields.',
+                    confirmButtonColor: '#4e73df'
+                });
+                return false;
+            }
+            
+            return true;
+        });
+
+        function updateConfirmationModal() {
+            // Combine names
+            const brideName = [
+                $('input[name="bride_fname"]').val(),
+                $('input[name="bride_mname"]').val(),
+                $('input[name="bride_lname"]').val()
+            ].filter(Boolean).join(' ');
+
+            const groomName = [
+                $('input[name="groom_fname"]').val(),
+                $('input[name="groom_mname"]').val(),
+                $('input[name="groom_lname"]').val()
+            ].filter(Boolean).join(' ');
+
+            // Update modal fields
+            $('#confirm-wedding-date').text(formatDate($('input[name="wedding_date"]').val()));
+            $('#confirm-wedding-time').text($('select[name="preferred_time"]').val());
+            $('#confirm-contact').text($('input[name="contact_number"]').val());
+            $('#confirm-email').text($('input[name="email"]').val());
+
+            // Bride details
+            $('#confirm-bride-name').text(brideName);
+            $('#confirm-bride-dob').text(formatDate($('input[name="bride_dob"]').val()));
+            $('#confirm-bride-birthplace').text($('input[name="bride_birthplace"]').val());
+            $('#confirm-bride-mother').text($('input[name="bride_mother"]').val());
+            $('#confirm-bride-father').text($('input[name="bride_father"]').val());
+            $('#confirm-bride-prenup').text($('input[name="bride_prenup"]:checked').val()?.toUpperCase() || 'NO');
+            $('#confirm-bride-precana').text($('input[name="bride_precana"]:checked').val()?.toUpperCase() || 'NO');
+
+            // Groom details
+            $('#confirm-groom-name').text(groomName);
+            $('#confirm-groom-dob').text(formatDate($('input[name="groom_dob"]').val()));
+            $('#confirm-groom-birthplace').text($('input[name="groom_birthplace"]').val());
+            $('#confirm-groom-mother').text($('input[name="groom_mother"]').val());
+            $('#confirm-groom-father').text($('input[name="groom_father"]').val());
+            $('#confirm-groom-prenup').text($('input[name="groom_prenup"]:checked').val()?.toUpperCase() || 'NO');
+            $('#confirm-groom-precana').text($('input[name="groom_precana"]:checked').val()?.toUpperCase() || 'NO');
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            return new Date(dateString).toLocaleDateString('en-US', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+    });
+    </script>
 <?php endif; ?>
 
 <!-- Make sure these are in your header -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    <?php
-    $stmt = $db->prepare("
-        SELECT wedding_date 
-        FROM bookings 
-        WHERE wedding_date IS NOT NULL 
-        AND status != 'cancelled'
-    ");
-    $stmt->execute();
-    $reserved_dates = $stmt->fetchAll(PDO::FETCH_COLUMN);
-    ?>
-    
-    const reservedDates = <?= json_encode($reserved_dates) ?>;
-    const calendarEl = document.getElementById('weddingCalendar');
-    
-    const calendar = new FullCalendar.Calendar(calendarEl, {
-        initialView: 'dayGridMonth',
-        selectable: true,
-        selectMirror: true,
-        weekends: true,
-        headerToolbar: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'dayGridMonth'
-        },
-        dateClick: function(info) {
-            const clickedDate = info.dateStr;
-            const selectedDisplay = document.getElementById('selectedDateDisplay');
-            const validationMessage = document.getElementById('dateValidationMessage');
-            
-            // Check if date is in the past
-            if (new Date(clickedDate) < new Date()) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Invalid Date',
-                    text: 'Please select a future date.',
-                    confirmButtonColor: '#dc3545'
-                });
-                return;
-            }
-
-            // Check if date is reserved
-            if (reservedDates.includes(clickedDate)) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Date Unavailable',
-                    text: 'This date is already reserved. Please select another date.',
-                    confirmButtonColor: '#dc3545'
-                });
-                return;
-            }
-
-            // Update selection
-            document.getElementById('selected_date').value = clickedDate;
-            document.getElementById('selectedDateText').innerHTML = 
-                new Date(clickedDate).toLocaleDateString('en-US', {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                });
-
-            selectedDisplay.classList.remove('d-none');
-            validationMessage.classList.add('d-none');
-
-            // Clear previous selections and highlight new selection
-            calendar.unselect();
-            calendar.addEvent({
-                start: clickedDate,
-                end: clickedDate,
-                display: 'background',
-                backgroundColor: '#cfe2ff'
-            });
-        },
-        events: reservedDates.map(date => ({
-            start: date,
-            display: 'background',
-            backgroundColor: '#ffebee'
-        }))
-    });
-
-    calendar.render();
-
-    // Form validation
-    document.getElementById('bookingForm').addEventListener('submit', function(e) {
-        const selectedDate = document.getElementById('selected_date').value;
-        const validationMessage = document.getElementById('dateValidationMessage');
-        
-        if (!selectedDate) {
-            e.preventDefault();
-            validationMessage.classList.remove('d-none');
-            document.getElementById('weddingCalendar').scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-            });
-        }
-    });
-});
-</script>
 
 <style>
 #weddingCalendar {

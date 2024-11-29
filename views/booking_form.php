@@ -8,49 +8,290 @@ if(!isset($_SESSION['user_id'])) {
 <div class="booking-container">
     <h2>Wedding Booking Form</h2>
     
-    <form id="bookingForm" class="needs-validation" novalidate>
+    <form id="bookingForm" method="POST" action="ajax/confirm_booking.php" class="needs-validation" novalidate>
         <div class="form-section">
             <h3>Couple Information</h3>
             
             <!-- Groom Information -->
-            <div class="form-group">
-                <label>Groom's Information</label>
-                <input type="text" name="groom_name" class="form-control" required 
-                       data-parsley-required="true" placeholder="Full Name">
-                <input type="email" name="groom_email" class="form-control" required 
-                       data-parsley-type="email" placeholder="Email">
-                <input type="tel" name="groom_phone" class="form-control" required 
-                       data-parsley-pattern="^[0-9]{11}$" placeholder="Phone Number">
+            <div class="form-group mb-4">
+                <label class="fw-bold">Groom's Information</label>
+                <input type="text" name="groom_name" class="form-control mb-2" required 
+                       placeholder="Full Name">
+                <input type="email" name="groom_email" class="form-control mb-2" required 
+                       placeholder="Email">
+                <input type="tel" name="groom_phone" class="form-control mb-2" required 
+                       placeholder="Phone Number">
+                <!-- Added required fields -->
+                <input type="date" name="groom_dob" class="form-control mb-2" required 
+                       placeholder="Date of Birth">
+                <input type="text" name="groom_birthplace" class="form-control mb-2" required 
+                       placeholder="Birthplace">
+                <input type="text" name="groom_mother" class="form-control mb-2" required 
+                       placeholder="Mother's Name">
+                <input type="text" name="groom_father" class="form-control mb-2" required 
+                       placeholder="Father's Name">
+                
+                <div class="mb-2">
+                    <label>PRE-NUPTIAL Interview</label>
+                    <div class="form-check">
+                        <input type="radio" name="groom_interview" value="yes" required class="form-check-input">
+                        <label class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="groom_interview" value="no" required class="form-check-input">
+                        <label class="form-check-label">No</label>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <label>PRE-CANA Seminar</label>
+                    <div class="form-check">
+                        <input type="radio" name="groom_seminar" value="yes" required class="form-check-input">
+                        <label class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="groom_seminar" value="no" required class="form-check-input">
+                        <label class="form-check-label">No</label>
+                    </div>
+                </div>
             </div>
 
             <!-- Bride Information -->
-            <div class="form-group">
-                <label>Bride's Information</label>
-                <input type="text" name="bride_name" class="form-control" required 
-                       data-parsley-required="true" placeholder="Full Name">
-                <input type="email" name="bride_email" class="form-control" required 
-                       data-parsley-type="email" placeholder="Email">
-                <input type="tel" name="bride_phone" class="form-control" required 
-                       data-parsley-pattern="^[0-9]{11}$" placeholder="Phone Number">
-            </div>
-        </div>
+            <div class="form-group mb-4">
+                <label class="fw-bold">Bride's Information</label>
+                <input type="text" name="bride_name" class="form-control mb-2" required 
+                       placeholder="Full Name">
+                <input type="email" name="bride_email" class="form-control mb-2" required 
+                       placeholder="Email">
+                <input type="tel" name="bride_phone" class="form-control mb-2" required 
+                       placeholder="Phone Number">
+                <!-- Added required fields -->
+                <input type="date" name="bride_dob" class="form-control mb-2" required 
+                       placeholder="Date of Birth">
+                <input type="text" name="bride_birthplace" class="form-control mb-2" required 
+                       placeholder="Birthplace">
+                <input type="text" name="bride_mother" class="form-control mb-2" required 
+                       placeholder="Mother's Name">
+                <input type="text" name="bride_father" class="form-control mb-2" required 
+                       placeholder="Father's Name">
 
-        <div class="form-section">
-            <h3>Wedding Details</h3>
-            <div id="calendar"></div>
-            <input type="hidden" name="wedding_date" id="selected_date" required>
-        </div>
+                <div class="mb-2">
+                    <label>PRE-NUPTIAL Interview</label>
+                    <div class="form-check">
+                        <input type="radio" name="bride_interview" value="yes" required class="form-check-input">
+                        <label class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="bride_interview" value="no" required class="form-check-input">
+                        <label class="form-check-label">No</label>
+                    </div>
+                </div>
 
-        <div class="form-section">
-            <h3>Required Documents</h3>
-            <div id="documentUpload" class="dropzone">
-                <div class="dz-message">
-                    Drop files here or click to upload<br>
-                    <small>Required: Baptismal, Confirmation, Marriage License</small>
+                <div class="mb-2">
+                    <label>PRE-CANA Seminar</label>
+                    <div class="form-check">
+                        <input type="radio" name="bride_seminar" value="yes" required class="form-check-input">
+                        <label class="form-check-label">Yes</label>
+                    </div>
+                    <div class="form-check">
+                        <input type="radio" name="bride_seminar" value="no" required class="form-check-input">
+                        <label class="form-check-label">No</label>
+                    </div>
                 </div>
             </div>
+        </div>
+
+        <div class="form-section mb-4">
+            <h3>Wedding Details</h3>
+            <div class="calendar-container">
+                <div id="calendar" style="height: 600px;"></div>
+                <input type="hidden" name="wedding_date" id="selected_date" required>
+            </div>
+            <select name="preferred_time" class="form-control mt-3" required>
+                <option value="">Select Preferred Time</option>
+                <option value="8:00 AM">8:00 AM</option>
+                <option value="10:30 AM">10:30 AM</option>
+                <option value="2:00 PM">2:00 PM</option>
+            </select>
         </div>
 
         <button type="submit" class="btn btn-primary">Submit Booking</button>
     </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var calendarEl = document.getElementById('calendar');
+    
+    // Get today's date
+    var today = new Date();
+    
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        height: '100%',
+        headerToolbar: {
+            left: 'prev',
+            center: 'title',
+            right: 'next'
+        },
+        selectable: true,
+        selectMirror: true,
+        unselectAuto: false,
+        
+        // Disable past dates
+        validRange: {
+            start: today
+        },
+        
+        // Date click handler
+        dateClick: function(info) {
+            // Check if date is in the past
+            if (new Date(info.dateStr) < today) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Invalid Date',
+                    text: 'Cannot select past dates'
+                });
+                return;
+            }
+            
+            // Remove previous selections
+            document.querySelectorAll('.date-selected').forEach(el => {
+                el.classList.remove('date-selected');
+            });
+            
+            // Add selected class
+            info.dayEl.classList.add('date-selected');
+            
+            // Update hidden input
+            document.getElementById('selected_date').value = info.dateStr;
+            
+            // Show confirmation
+            Swal.fire({
+                icon: 'info',
+                title: 'Date Selected',
+                text: `You selected: ${new Date(info.dateStr).toLocaleDateString('en-US', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                })}`,
+                showCancelButton: true,
+                confirmButtonText: 'Confirm Date',
+                cancelButtonText: 'Change Date'
+            }).then((result) => {
+                if (!result.isConfirmed) {
+                    info.dayEl.classList.remove('date-selected');
+                    document.getElementById('selected_date').value = '';
+                }
+            });
+        },
+        
+        // Load booked dates
+        datesSet: function(info) {
+            fetch('ajax/get_booked_dates.php')
+                .then(response => response.json())
+                .then(bookedDates => {
+                    // Clear previous booked indicators
+                    document.querySelectorAll('.booked-indicator').forEach(el => el.remove());
+                    
+                    // Mark booked dates
+                    bookedDates.forEach(date => {
+                        const el = document.querySelector(`[data-date="${date}"]`);
+                        if (el) {
+                            el.classList.add('fc-disabled');
+                            const indicator = document.createElement('div');
+                            indicator.className = 'booked-indicator';
+                            indicator.textContent = 'Booked';
+                            el.appendChild(indicator);
+                        }
+                    });
+                })
+                .catch(error => console.error('Error loading booked dates:', error));
+        }
+    });
+    
+    calendar.render();
+});
+</script>
+
+<style>
+/* Calendar Styles */
+.calendar-container {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    margin: 20px 0;
+}
+
+.fc {
+    max-width: 100%;
+    background: white;
+}
+
+.fc .fc-toolbar.fc-header-toolbar {
+    margin-bottom: 1.5em;
+    padding: 10px;
+}
+
+.fc .fc-toolbar-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.fc .fc-button-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+    padding: 8px 16px;
+    font-weight: 500;
+}
+
+.fc .fc-button-primary:hover {
+    background-color: #0056b3;
+    border-color: #0056b3;
+}
+
+.fc .fc-button-primary:disabled {
+    background-color: #ccc;
+    border-color: #ccc;
+}
+
+.fc-day-past {
+    background-color: #f5f5f5 !important;
+    cursor: not-allowed;
+}
+
+.fc .date-selected {
+    background-color: #e7f1ff !important;
+}
+
+.fc .fc-disabled {
+    background-color: #fee !important;
+    cursor: not-allowed;
+}
+
+.booked-indicator {
+    position: absolute;
+    bottom: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8em;
+    color: #dc3545;
+    background: rgba(255,255,255,0.9);
+    padding: 2px 6px;
+    border-radius: 3px;
+}
+
+/* Make calendar responsive */
+@media (max-width: 768px) {
+    .fc .fc-toolbar.fc-header-toolbar {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .fc .fc-toolbar-title {
+        font-size: 1.2rem;
+    }
+}
+</style>

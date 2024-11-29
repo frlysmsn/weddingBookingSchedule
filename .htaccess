@@ -15,3 +15,26 @@ RewriteBase /
 # Handle errors
 ErrorDocument 500 /error.php
 ErrorDocument 404 /error.php
+
+# Enable error logging
+php_flag log_errors on
+php_value error_log /path/to/your/error.log
+
+# Allow CORS
+Header set Access-Control-Allow-Origin "*"
+Header set Access-Control-Allow-Methods "POST, GET, OPTIONS"
+Header set Access-Control-Allow-Headers "Content-Type"
+
+# Handle 404 errors
+ErrorDocument 404 /404.php
+
+# Rewrite rules
+RewriteEngine On
+RewriteBase /
+
+# If the request is not for a real file or directory
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Route all requests through index.php
+RewriteRule ^(.*)$ index.php [QSA,L]

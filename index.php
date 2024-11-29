@@ -25,20 +25,23 @@ switch($page) {
         break;
     case 'client-dashboard':
         if($auth->isLoggedIn() && !$auth->isAdmin()) {
-            header('Location: client/index.php');
-            exit;
+            include 'views/client_dashboard.php';
         } else {
             header('Location: index.php?page=login');
-            exit;
         }
         break;
     case 'admin-dashboard':
         if($auth->isLoggedIn() && $auth->isAdmin()) {
-            header('Location: admin/index.php');
-            exit;
+            include 'views/admin_dashboard.php';
         } else {
-            header('Location: admin/login.php');
-            exit;
+            header('Location: index.php?page=login');
+        }
+        break;
+    case 'booking':
+        if($auth->isLoggedIn()) {
+            include 'views/booking_form.php';
+        } else {
+            header('Location: index.php?page=login');
         }
         break;
     default:

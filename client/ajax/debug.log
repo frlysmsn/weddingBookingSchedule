@@ -1,0 +1,122 @@
+[2024-11-29 09:01:28] Request received: Array
+(
+    [bride_fname] => Vivien Mcpherson
+    [bride_mname] => Cassady Adams
+    [bride_lname] => Linda Quinn
+    [bride_dob] => 1982-06-15
+    [bride_birthplace] => Doloremque elit sed
+    [bride_mother] => Officia et assumenda
+    [bride_father] => Velit temporibus dol
+    [bride_prenup] => yes
+    [bride_precana] => no
+    [groom_fname] => Cairo Keith
+    [groom_mname] => Blair Fitzpatrick
+    [groom_lname] => Oprah Townsend
+    [groom_dob] => 2005-09-26
+    [groom_birthplace] => Quibusdam est quis 
+    [groom_mother] => Minus et modi fuga 
+    [groom_father] => Omnis Nam tempor rec
+    [groom_prenup] => yes
+    [groom_precana] => no
+    [wedding_date] => 2014-11-23
+    [preferred_time] => 08:00-09:00
+    [contact_number] => +1 (817) 611-5849
+    [email] => nycezox@mailinator.com
+)
+
+[2024-11-29 09:01:28] Session: Array
+(
+    [user_id] => 7
+    [name] => jelian
+    [email] => w@gmail.com
+    [role] => client
+)
+
+[2024-11-29 09:12:47] Request received: Array
+(
+    [bride_fname] => Idona Burton
+    [bride_mname] => Shelly Vega
+    [bride_lname] => Imelda Carroll
+    [bride_dob] => 1974-09-07
+    [bride_birthplace] => Et distinctio Ad vo
+    [bride_mother] => Excepteur molestiae 
+    [bride_father] => Et commodo magnam ex
+    [bride_prenup] => yes
+    [bride_precana] => no
+    [groom_fname] => Mercedes Vargas
+    [groom_mname] => Basia Beck
+    [groom_lname] => Sydnee Dixon
+    [groom_dob] => 1997-05-21
+    [groom_birthplace] => Qui facilis ullam im
+    [groom_mother] => Ut rem natus hic sin
+    [groom_father] => Saepe reprehenderit
+    [groom_prenup] => no
+    [groom_precana] => no
+    [wedding_date] => 2012-07-22
+    [preferred_time] => 09:00-10:00
+    [contact_number] => +1 (981) 498-2683
+    [email] => xaholehu@mailinator.com
+)
+
+[2024-11-29 09:12:51] Request received: Array
+(
+    [bride_fname] => Idona Burton
+    [bride_mname] => Shelly Vega
+    [bride_lname] => Imelda Carroll
+    [bride_dob] => 1974-09-07
+    [bride_birthplace] => Et distinctio Ad vo
+    [bride_mother] => Excepteur molestiae 
+    [bride_father] => Et commodo magnam ex
+    [bride_prenup] => yes
+    [bride_precana] => no
+    [groom_fname] => Mercedes Vargas
+    [groom_mname] => Basia Beck
+    [groom_lname] => Sydnee Dixon
+    [groom_dob] => 1997-05-21
+    [groom_birthplace] => Qui facilis ullam im
+    [groom_mother] => Ut rem natus hic sin
+    [groom_father] => Saepe reprehenderit
+    [groom_prenup] => no
+    [groom_precana] => no
+    [wedding_date] => 2012-07-22
+    [preferred_time] => 09:00-10:00
+    [contact_number] => +1 (981) 498-2683
+    [email] => xaholehu@mailinator.com
+)
+
+[2024-11-29 09:21:03] === New Request Started ===
+[2024-11-29 09:21:03] POST Data: Array
+(
+    [bride_fname] => Naomi Fox
+    [bride_mname] => Harlan May
+    [bride_lname] => Rogan Horne
+    [bride_dob] => 1994-09-13
+    [bride_birthplace] => Quibusdam non minus 
+    [bride_mother] => Ab nihil a ex quidem
+    [bride_father] => Ipsum elit atque s
+    [bride_prenup] => yes
+    [bride_precana] => yes
+    [groom_fname] => Anne Horn
+    [groom_mname] => Simon Walton
+    [groom_lname] => TaShya Solis
+    [groom_dob] => 1986-02-14
+    [groom_birthplace] => Molestiae aliquid du
+    [groom_mother] => Ipsa quia eos rerum
+    [groom_father] => Est repudiandae dist
+    [groom_prenup] => yes
+    [groom_precana] => yes
+    [wedding_date] => 1991-11-05
+    [preferred_time] => 13:00-14:00
+    [contact_number] => +1 (604) 295-5429
+    [email] => qavydetuna@mailinator.com
+)
+
+[2024-11-29 09:21:03] Session Data: Array
+(
+    [user_id] => 7
+    [name] => jelian
+    [email] => w@gmail.com
+    [role] => client
+)
+
+[2024-11-29 09:21:03] Database Connected Successfully

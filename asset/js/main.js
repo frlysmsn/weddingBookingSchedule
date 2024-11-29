@@ -45,7 +45,6 @@ function handleDateSelection(info) {
         cancelButtonText: 'No, cancel'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Add your booking logic here
             $.post('api/book-date.php', {
                 date: info.startStr
             })
