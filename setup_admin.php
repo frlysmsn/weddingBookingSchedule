@@ -7,10 +7,10 @@ try {
     
     // Delete existing admin if exists
     $stmt = $db->prepare("DELETE FROM users WHERE email = ?");
-    $stmt->execute(['admin@admin.com']);
+    $stmt->execute(['admin@admin1.com']);
     
     // Create new admin
-    $password = 'admin123';
+    $password = 'admin';
     $hashed_password = password_hash($password, PASSWORD_DEFAULT);
     
     $stmt = $db->prepare("
@@ -20,7 +20,7 @@ try {
     
     $stmt->execute([
         'Admin',
-        'admin@admin.com',
+        'admin@admin1.com',
         $hashed_password,
         'admin'
     ]);

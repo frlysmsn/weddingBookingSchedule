@@ -1,0 +1,50 @@
+/* Form validation styles */
+.form-group.error input {
+    border-color: #dc3545;
+    background-color: #fff8f8;
+}
+
+.form-group.success input {
+    border-color: #28a745;
+    background-color: #f8fff8;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.form-group.error .error-message {
+    display: block;
+}
+
+/* Custom validation icons */
+.form-group {
+    position: relative;
+}
+
+.form-group::after {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Font Awesome 5 Free';
+    font-weight: 900;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.form-group.error::after {
+    content: '\f071';
+    color: #dc3545;
+    opacity: 1;
+}
+
+.form-group.success::after {
+    content: '\f00c';
+    color: #28a745;
+    opacity: 1;
+} 

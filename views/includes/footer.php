@@ -9,12 +9,10 @@
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li><a href="index.php">Home</a></li>
+                        <li style><a href="index.php">Home</a></li>
                         <?php if(isset($_SESSION['user_id'])): ?>
                             <li><a href="index.php?page=booking">Book Now</a></li>
                         <?php else: ?>
-                            <li><a href="index.php?page=login">Login</a></li>
-                            <li><a href="index.php?page=register">Register</a></li>
                         <?php endif; ?>
                     </ul>
                 </div>

@@ -1,0 +1,22 @@
+
+
+/* Add responsive grid layout */
+.content-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    padding-top: 80px;
+}
+
+@media (max-width: 992px) {
+    .content-wrapper {
+        grid-template-columns: 1fr;
+    }
+    
+    .auth-sidebar {
+        position: static;
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+} 

@@ -19,6 +19,7 @@ $(document).ready(function() {
         });
     });
 
+
     // Approve Booking
     $('.approve-booking').click(function() {
         const bookingId = $(this).data('id');

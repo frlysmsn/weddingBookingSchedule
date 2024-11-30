@@ -116,11 +116,109 @@ $pending_bookings = $stmt->fetchColumn();
     </div>
 
     <!-- Scripts -->
-    <script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
     <script src="assets/js/admin.js"></script>
+    <script>
+$(document).ready(function() {
+    // Initialize DataTables
+    $('#adminsTable').DataTable({
+        order: [[0, 'asc']],
+        pageLength: 10
+    });
+    
+    $('#clientsTable').DataTable({
+        order: [[0, 'asc']],
+        pageLength: 10
+    });
+
+    // Admin form submission
+    $('#addAdminForm').on('submit', function(e) {
+        e.preventDefault();
+        console.log('Form submitted');
+        
+        $.ajax({
+            url: 'ajax/add_admin.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                console.log('Response received:', response);
+                try {
+                    response = JSON.parse(response);
+                    if (response.success) {
+                        Swal.fire(
+                            'Success!',
+                            'Administrator added successfully.',
+                            'success'
+                        ).then(() => {
+                            $('#addAdminModal').modal('hide');
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            response.message || 'Failed to add administrator.',
+                            'error'
+                        );
+                    }
+                } catch (e) {
+                    console.error('Parse error:', e);
+                    Swal.fire('Error!', 'Invalid server response.', 'error');
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('AJAX Error:', status, error);
+                Swal.fire(
+                    'Error!',
+                    'An error occurred while adding the administrator.',
+                    'error'
+                );
+            }
+        });
+    });
+
+    // Demote admin function
+    window.demoteAdmin = function(userId) {
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Yes, demote it!',
+            cancelButtonText: 'No, cancel!',
+            reverseButtons: true
+        }).then((result) => {
+            if (result.isConfirmed) {
+                $.ajax({
+                    url: 'ajax/demote_admin.php',
+                    type: 'POST',
+                    data: { user_id: userId },
+                    success: function(response) {
+                        try {
+                            response = JSON.parse(response);
+                            if (response.success) {
+                                Swal.fire('Success!', 'Administrator demoted successfully.', 'success')
+                                    .then(() => location.reload());
+                            } else {
+                                Swal.fire('Error!', response.message || 'Failed to demote administrator.', 'error');
+                            }
+                        } catch (e) {
+                            console.error('Parse error:', e);
+                            Swal.fire('Error!', 'Invalid server response.', 'error');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('AJAX Error:', status, error);
+                        Swal.fire('Error!', 'An error occurred while demoting the administrator.', 'error');
+                    }
+                });
+            }
+        });
+    }
+});
+</script>
 </body>
 </html> 

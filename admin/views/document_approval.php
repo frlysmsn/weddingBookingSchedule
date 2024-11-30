@@ -319,4 +319,19 @@ function rejectDocument(docId) {
 .dataTables_wrapper .dataTables_filter input {
     min-width: 200px;
 }
+@media (max-width: 768px) {
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .modal-dialog {
+        max-width: 90%;
+        margin: 1.75rem auto;
+    }
+
+    .btn {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+}
 </style> 

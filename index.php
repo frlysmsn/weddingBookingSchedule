@@ -47,6 +47,6 @@ switch($page) {
     default:
         include 'views/404.php';
 }
-
 // Footer
 include 'views/includes/footer.php';
+
