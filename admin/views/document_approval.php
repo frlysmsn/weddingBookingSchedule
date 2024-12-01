@@ -6,30 +6,25 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $db = Database::getInstance()->getConnection();
 
-// Get users with pending documents
+// Get users with documents (both pending and approved)
 $stmt = $db->query("
     SELECT DISTINCT 
         u.id,
         u.name,
         u.email,
-        b.wedding_date,
-        (SELECT COUNT(*) FROM documents d2 WHERE d2.booking_id = b.id AND d2.status = 'pending') as pending_docs,
-        (SELECT COUNT(*) FROM documents d3 WHERE d3.booking_id = b.id) as total_docs
+        (SELECT COUNT(*) FROM documents d2 WHERE d2.user_id = u.id AND d2.status = 'approved') as approved_docs,
+        (SELECT COUNT(*) FROM documents d3 WHERE d3.user_id = u.id) as total_docs
     FROM users u
-    JOIN bookings b ON u.id = b.user_id
-    JOIN documents d ON d.booking_id = b.id
-    WHERE d.status = 'pending'
-    ORDER BY b.wedding_date ASC
+    JOIN documents d ON d.user_id = u.id
+    ORDER BY u.name ASC
 ");
 $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <div class="container-fluid">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h2 class="h3 mb-0">Document Approval</h2>
-    </div>
-
-    <div class="card shadow">
+    <h2 class="mb-4">Document Approval</h2>
+    
+    <div class="card">
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-hover" id="documentsTable">
@@ -37,7 +32,6 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                         <tr>
                             <th>Client Name</th>
                             <th>Email</th>
-                            <th>Wedding Date</th>
                             <th>Documents Status</th>
                             <th>Actions</th>
                         </tr>
@@ -47,29 +41,17 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                             <tr>
                                 <td><?= htmlspecialchars($user['name']) ?></td>
                                 <td><?= htmlspecialchars($user['email']) ?></td>
-                                <td><?= date('M d, Y', strtotime($user['wedding_date'])) ?></td>
                                 <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <?php 
-                                        $percentage = ($user['total_docs'] - $user['pending_docs']) / $user['total_docs'] * 100;
-                                        ?>
-                                        <div class="progress-bar bg-success" 
-                                             role="progressbar" 
-                                             style="width: <?= $percentage ?>%"
-                                             aria-valuenow="<?= $percentage ?>" 
-                                             aria-valuemin="0" 
-                                             aria-valuemax="100">
-                                            <?= floor($percentage) ?>%
-                                        </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="badge bg-success me-2">
+                                            <?= $user['approved_docs'] ?> of <?= $user['total_docs'] ?> approved
+                                        </span>
                                     </div>
-                                    <small class="text-muted">
-                                        <?= $user['total_docs'] - $user['pending_docs'] ?> of <?= $user['total_docs'] ?> approved
-                                    </small>
                                 </td>
                                 <td>
                                     <button class="btn btn-primary btn-sm" 
                                             onclick="viewDocuments(<?= $user['id'] ?>)">
-                                        <i class="fas fa-file-alt"></i> View Documents
+                                        View Documents
                                     </button>
                                 </td>
                             </tr>
@@ -86,19 +68,26 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Client Documents</h5>
+                <h5 class="modal-title">User Documents</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <div class="client-info mb-4">
-                    <!-- Client info will be loaded here -->
-                </div>
-                <div class="documents-list">
-                    <!-- Documents will be loaded here -->
-                </div>
+                <!-- Documents will be loaded here -->
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Document Preview Modal -->
+<div class="modal fade" id="previewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Document Preview</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <iframe id="documentPreview" style="width: 100%; height: 80vh; border: none;"></iframe>
             </div>
         </div>
     </div>
@@ -247,6 +236,20 @@ function rejectDocument(docId) {
         }
     });
 }
+
+function previewDocument(docId) {
+    $('#documentsModal').modal('hide');
+    $('#documentPreview').attr('src', `../api/view-document.php?id=${docId}`);
+    $('#previewModal').modal('show');
+}
+
+// Handle preview modal close
+$('#previewModal').on('hidden.bs.modal', function () {
+    // Show the documents modal again
+    $('#documentsModal').modal('show');
+    // Clear the iframe source
+    $('#documentPreview').attr('src', '');
+});
 </script>
 
 <style>

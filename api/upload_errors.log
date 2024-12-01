@@ -1571,3 +1571,411 @@
 [2024-12-01 07:12:20] Transaction started
 [2024-12-01 07:12:20] Using existing booking ID: 30
 [2024-12-01 07:12:20] Transaction committed successfully
+[2024-12-01 08:50:36] Upload attempt started
+[2024-12-01 08:50:36] User ID: 25
+[2024-12-01 08:50:36] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 08:50:36] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php32A0.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-12-01 08:50:36] Document type: baptismal
+[2024-12-01 08:50:36] Transaction started
+[2024-12-01 08:50:36] Creating new booking
+[2024-12-01 08:50:36] Created new booking: 31
+[2024-12-01 08:50:36] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/31
+[2024-12-01 08:50:36] Transaction committed successfully
+[2024-12-01 08:51:47] Upload attempt started
+[2024-12-01 08:51:47] User ID: 26
+[2024-12-01 08:51:47] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 08:51:47] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php47F9.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 08:51:47] Document type: baptismal
+[2024-12-01 08:51:47] Transaction started
+[2024-12-01 08:51:47] Creating new booking
+[2024-12-01 08:51:47] Created new booking: 32
+[2024-12-01 08:51:47] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/32
+[2024-12-01 08:51:47] Transaction committed successfully
+[2024-12-01 09:31:52] Upload attempt started
+[2024-12-01 09:31:52] User ID: 26
+[2024-12-01 09:31:52] POST data: Array
+(
+    [document_type] => birth_certificate
+)
+
+[2024-12-01 09:31:52] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Manzo-AddData_Act1.pdf
+            [full_path] => Manzo-AddData_Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpFA43.tmp
+            [error] => 0
+            [size] => 459742
+        )
+
+)
+
+[2024-12-01 09:31:52] Document type: birth_certificate
+[2024-12-01 09:31:52] Transaction started
+[2024-12-01 09:31:52] Using existing booking ID: 32
+[2024-12-01 09:31:52] Transaction committed successfully
+[2024-12-01 09:32:00] Upload attempt started
+[2024-12-01 09:32:00] User ID: 26
+[2024-12-01 09:32:00] POST data: Array
+(
+    [document_type] => confirmation
+)
+
+[2024-12-01 09:32:00] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Manzo-AddData_Act1.pdf
+            [full_path] => Manzo-AddData_Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php1732.tmp
+            [error] => 0
+            [size] => 459742
+        )
+
+)
+
+[2024-12-01 09:32:00] Document type: confirmation
+[2024-12-01 09:32:00] Transaction started
+[2024-12-01 09:32:00] Using existing booking ID: 32
+[2024-12-01 09:32:00] Transaction committed successfully
+[2024-12-01 09:32:03] Upload attempt started
+[2024-12-01 09:32:03] User ID: 26
+[2024-12-01 09:32:03] POST data: Array
+(
+    [document_type] => cenomar
+)
+
+[2024-12-01 09:32:03] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php2349.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 09:32:03] Document type: cenomar
+[2024-12-01 09:32:03] Transaction started
+[2024-12-01 09:32:03] Using existing booking ID: 32
+[2024-12-01 09:32:03] Transaction committed successfully
+[2024-12-01 09:32:07] Upload attempt started
+[2024-12-01 09:32:07] User ID: 26
+[2024-12-01 09:32:07] POST data: Array
+(
+    [document_type] => marriage_license
+)
+
+[2024-12-01 09:32:07] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php3309.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 09:32:07] Document type: marriage_license
+[2024-12-01 09:32:07] Transaction started
+[2024-12-01 09:32:07] Using existing booking ID: 32
+[2024-12-01 09:32:07] Transaction committed successfully
+[2024-12-01 09:32:56] Upload attempt started
+[2024-12-01 09:32:56] User ID: 27
+[2024-12-01 09:32:56] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 09:32:56] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpF38C.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 09:32:56] Document type: baptismal
+[2024-12-01 09:32:56] Transaction started
+[2024-12-01 09:32:56] Creating new booking
+[2024-12-01 09:32:56] Created new booking: 33
+[2024-12-01 09:32:56] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/33
+[2024-12-01 09:32:56] Transaction committed successfully
+[2024-12-01 09:33:23] Upload attempt started
+[2024-12-01 09:33:23] User ID: 27
+[2024-12-01 09:33:23] POST data: Array
+(
+    [document_type] => birth_certificate
+)
+
+[2024-12-01 09:33:23] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php5DEF.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 09:33:23] Document type: birth_certificate
+[2024-12-01 09:33:23] Transaction started
+[2024-12-01 09:33:23] Using existing booking ID: 33
+[2024-12-01 09:33:23] Transaction committed successfully
+[2024-12-01 09:33:26] Upload attempt started
+[2024-12-01 09:33:26] User ID: 27
+[2024-12-01 09:33:26] POST data: Array
+(
+    [document_type] => confirmation
+)
+
+[2024-12-01 09:33:26] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php6812.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-12-01 09:33:26] Document type: confirmation
+[2024-12-01 09:33:26] Transaction started
+[2024-12-01 09:33:26] Using existing booking ID: 33
+[2024-12-01 09:33:26] Transaction committed successfully
+[2024-12-01 09:33:28] Upload attempt started
+[2024-12-01 09:33:28] User ID: 27
+[2024-12-01 09:33:28] POST data: Array
+(
+    [document_type] => cenomar
+)
+
+[2024-12-01 09:33:28] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php71C7.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-12-01 09:33:28] Document type: cenomar
+[2024-12-01 09:33:28] Transaction started
+[2024-12-01 09:33:28] Using existing booking ID: 33
+[2024-12-01 09:33:28] Transaction committed successfully
+[2024-12-01 09:33:31] Upload attempt started
+[2024-12-01 09:33:31] User ID: 27
+[2024-12-01 09:33:31] POST data: Array
+(
+    [document_type] => marriage_license
+)
+
+[2024-12-01 09:33:31] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Manzo-AddData_Act1.pdf
+            [full_path] => Manzo-AddData_Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php7C96.tmp
+            [error] => 0
+            [size] => 459742
+        )
+
+)
+
+[2024-12-01 09:33:31] Document type: marriage_license
+[2024-12-01 09:33:31] Transaction started
+[2024-12-01 09:33:31] Using existing booking ID: 33
+[2024-12-01 09:33:31] Transaction committed successfully
+[2024-12-01 14:00:31] Upload attempt started
+[2024-12-01 14:00:31] User ID: 29
+[2024-12-01 14:00:31] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 14:00:31] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpED40.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-12-01 14:00:31] Document type: baptismal
+[2024-12-01 14:00:31] Transaction started
+[2024-12-01 14:00:31] Transaction committed successfully
+[2024-12-01 14:05:19] Upload attempt started
+[2024-12-01 14:05:19] User ID: 29
+[2024-12-01 14:05:19] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 14:05:19] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => Act1.pdf
+            [full_path] => Act1.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php5464.tmp
+            [error] => 0
+            [size] => 459568
+        )
+
+)
+
+[2024-12-01 14:05:19] Document type: baptismal
+[2024-12-01 14:05:19] Transaction started
+[2024-12-01 14:05:19] Transaction rolled back: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:05:19] Error occurred: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:07:41] Error occurred: User not authenticated
+[2024-12-01 14:13:33] Upload attempt started
+[2024-12-01 14:13:33] User ID: 29
+[2024-12-01 14:13:33] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 14:13:33] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpDE25.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 14:13:33] Document type: baptismal
+[2024-12-01 14:13:33] Transaction started
+[2024-12-01 14:13:33] Transaction rolled back: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:13:33] Error occurred: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:15:39] Upload attempt started
+[2024-12-01 14:15:39] User ID: 29
+[2024-12-01 14:15:39] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 14:15:39] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => REManzo_Quiz4.pdf
+            [full_path] => REManzo_Quiz4.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\phpC95C.tmp
+            [error] => 0
+            [size] => 68163
+        )
+
+)
+
+[2024-12-01 14:15:39] Document type: baptismal
+[2024-12-01 14:15:39] Transaction started
+[2024-12-01 14:15:39] Transaction rolled back: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:15:39] Error occurred: SQLSTATE[42S22]: Column not found: 1054 Unknown column 'user_id' in 'where clause'
+[2024-12-01 14:17:10] Upload attempt started
+[2024-12-01 14:17:10] User ID: 29
+[2024-12-01 14:17:10] POST data: Array
+(
+    [document_type] => baptismal
+)
+
+[2024-12-01 14:17:10] FILES data: Array
+(
+    [document] => Array
+        (
+            [name] => PERALTA.pdf
+            [full_path] => PERALTA.pdf
+            [type] => application/pdf
+            [tmp_name] => C:\xampp\tmp\php2BFC.tmp
+            [error] => 0
+            [size] => 458344
+        )
+
+)
+
+[2024-12-01 14:17:10] Document type: baptismal
+[2024-12-01 14:17:10] Transaction started
+[2024-12-01 14:17:10] Creating new booking
+[2024-12-01 14:17:10] Created new booking: 34
+[2024-12-01 14:17:10] Created directory: C:\xampp\htdocs\wedsched\api/../uploads/documents/34
+[2024-12-01 14:17:10] Transaction committed successfully

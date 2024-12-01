@@ -10,10 +10,9 @@ $db = Database::getInstance()->getConnection();
 $stmt = $db->prepare("
     SELECT 
         COUNT(*) as total_docs,
-        SUM(CASE WHEN d.status = 'approved' THEN 1 ELSE 0 END) as approved_docs
-    FROM documents d
-    JOIN bookings b ON d.booking_id = b.id
-    WHERE b.user_id = ?
+        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_docs
+    FROM documents 
+    WHERE user_id = ?
 ");
 $stmt->execute([$_SESSION['user_id']]);
 $doc_status = $stmt->fetch(PDO::FETCH_ASSOC);

@@ -50,8 +50,7 @@ $required_docs = [
 $stmt = $db->prepare("
     SELECT d.* 
     FROM documents d 
-    JOIN bookings b ON d.booking_id = b.id 
-    WHERE b.user_id = ?
+    WHERE d.user_id = ?
 ");
 $stmt->execute([$_SESSION['user_id']]);
 $uploaded_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);

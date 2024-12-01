@@ -12,8 +12,7 @@ $stmt = $db->prepare("
         COUNT(*) as total_docs,
         SUM(CASE WHEN d.status = 'approved' THEN 1 ELSE 0 END) as approved_docs
     FROM documents d
-    JOIN bookings b ON d.booking_id = b.id
-    WHERE b.user_id = ?
+    WHERE d.user_id = ?
 ");
 $stmt->execute([$_SESSION['user_id']]);
 $doc_status = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -36,7 +35,7 @@ $stmt = $db->prepare("
         b.*,
         u.name as client_name,
         u.email as client_email,
-        (SELECT COUNT(*) FROM documents d WHERE d.booking_id = b.id AND d.status = 'approved') as approved_docs
+        (SELECT COUNT(*) FROM documents d WHERE d.user_id = u.id AND d.status = 'approved') as approved_docs
     FROM bookings b
     JOIN users u ON b.user_id = u.id
     ORDER BY b.wedding_date ASC
@@ -51,11 +50,11 @@ $stmt = $db->query("
         u.name,
         u.email,
         b.wedding_date,
-        (SELECT COUNT(*) FROM documents d2 WHERE d2.booking_id = b.id AND d2.status = 'pending') as pending_docs,
-        (SELECT COUNT(*) FROM documents d3 WHERE d3.booking_id = b.id) as total_docs
+        (SELECT COUNT(*) FROM documents d2 WHERE d2.user_id = u.id AND d2.status = 'pending') as pending_docs,
+        (SELECT COUNT(*) FROM documents d3 WHERE d3.user_id = u.id) as total_docs
     FROM users u
     JOIN bookings b ON u.id = b.user_id
-    JOIN documents d ON d.booking_id = b.id
+    JOIN documents d ON d.user_id = u.id
     WHERE d.status = 'pending'
     ORDER BY b.wedding_date ASC
 ");

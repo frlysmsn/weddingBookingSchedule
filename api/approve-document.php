@@ -10,7 +10,6 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
     exit(json_encode(['error' => 'Unauthorized']));
 }
 
-// Get and validate inputs
 $document_id = filter_input(INPUT_POST, 'document_id', FILTER_VALIDATE_INT);
 $action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
 $remarks = filter_input(INPUT_POST, 'remarks', FILTER_SANITIZE_STRING);
@@ -29,13 +28,11 @@ try {
     $stmt = $db->prepare("
         SELECT 
             d.*,
-            b.id as booking_id,
             u.email,
             u.name as user_name,
             dr.name as document_name
         FROM documents d
-        JOIN bookings b ON d.booking_id = b.id
-        JOIN users u ON b.user_id = u.id
+        JOIN users u ON d.user_id = u.id
         LEFT JOIN document_requirements dr ON d.document_type = dr.document_type
         WHERE d.id = ?
     ");
@@ -70,51 +67,28 @@ try {
             COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved_count,
             COUNT(*) as total_count
         FROM documents 
-        WHERE booking_id = ?
+        WHERE user_id = ?
     ");
     
-    if (!$stmt->execute([$documentInfo['booking_id']])) {
+    if (!$stmt->execute([$documentInfo['user_id']])) {
         throw new Exception('Failed to calculate progress');
     }
     
     $counts = $stmt->fetch(PDO::FETCH_ASSOC);
-    
-    if ($counts['total_count'] > 0) {
-        $progress = ($counts['approved_count'] / $counts['total_count']) * 100;
-    } else {
-        $progress = 0;
-    }
+    $progress = ($counts['total_count'] > 0) ? ($counts['approved_count'] / $counts['total_count']) * 100 : 0;
 
-    // Update booking progress
-    $stmt = $db->prepare("
-        UPDATE bookings 
-        SET document_progress = ? 
-        WHERE id = ?
-    ");
-    
-    if (!$stmt->execute([$progress, $documentInfo['booking_id']])) {
-        throw new Exception('Failed to update booking progress');
-    }
-
-    // Prepare email notification
+    // Send email notification
     $to = $documentInfo['email'];
     $subject = "Document " . ucfirst($status) . " - St. Rita Parish";
     
-    if($action === 'approve') {
-        $message = "Dear " . $documentInfo['user_name'] . ",\n\n";
-        $message .= "Your document (" . $documentInfo['document_name'] . ") has been approved.\n";
-        $message .= "You can check your document status in your dashboard.\n\n";
-        $message .= "Best regards,\nSt. Rita Parish Team";
-    } else {
-        $message = "Dear " . $documentInfo['user_name'] . ",\n\n";
-        $message .= "Your document (" . $documentInfo['document_name'] . ") has been rejected.\n";
-        $message .= "Reason for rejection: " . $remarks . "\n\n";
-        $message .= "Please update and resubmit your document.\n";
-        $message .= "You can check your document status in your dashboard.\n\n";
-        $message .= "Best regards,\nSt. Rita Parish Team";
+    $message = "Dear " . $documentInfo['user_name'] . ",\n\n";
+    $message .= "Your document (" . $documentInfo['document_name'] . ") has been " . $status . ".\n";
+    if ($remarks) {
+        $message .= "Remarks: " . $remarks . "\n\n";
     }
+    $message .= "You can check your document status in your dashboard.\n\n";
+    $message .= "Best regards,\nSt. Rita Parish Team";
 
-    // Try to send email but don't fail if it doesn't work
     @mail($to, $subject, $message);
 
     $db->commit();
