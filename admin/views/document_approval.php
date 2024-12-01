@@ -24,34 +24,56 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="container-fluid">
     <h2 class="mb-4">Document Approval</h2>
     
-    <div class="card">
+    <div class="card shadow">
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-hover" id="documentsTable">
-                    <thead>
+                <table class="table table-hover align-middle" id="documentsTable">
+                    <thead class="table-light">
                         <tr>
-                            <th>Client Name</th>
-                            <th>Email</th>
-                            <th>Documents Status</th>
-                            <th>Actions</th>
+                            <th class="text-nowrap">Client Name</th>
+                            <th class="text-nowrap">Email</th>
+                            <th class="text-nowrap">Documents Status</th>
+                            <th class="text-center">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php foreach($users_with_docs as $user): ?>
                             <tr>
-                                <td><?= htmlspecialchars($user['name']) ?></td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+                                        <div class="avatar-circle">
+                                            <?= strtoupper(substr($user['name'], 0, 1)) ?>
+                                        </div>
+                                        <div class="ms-3">
+                                            <h6 class="mb-0"><?= htmlspecialchars($user['name']) ?></h6>
+                                        </div>
+                                    </div>
+                                </td>
                                 <td><?= htmlspecialchars($user['email']) ?></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <span class="badge bg-success me-2">
-                                            <?= $user['approved_docs'] ?> of <?= $user['total_docs'] ?> approved
+                                        <?php
+                                        $progress = ($user['total_docs'] > 0) ? ($user['approved_docs'] / $user['total_docs']) * 100 : 0;
+                                        $status_class = $progress == 100 ? 'bg-success' : ($progress > 0 ? 'bg-warning' : 'bg-danger');
+                                        ?>
+                                        <div class="progress flex-grow-1 me-2" style="height: 8px;">
+                                            <div class="progress-bar <?= $status_class ?>" 
+                                                 role="progressbar" 
+                                                 style="width: <?= $progress ?>%" 
+                                                 aria-valuenow="<?= $progress ?>" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                            </div>
+                                        </div>
+                                        <span class="badge <?= $status_class ?> rounded-pill">
+                                            <?= $user['approved_docs'] ?>/<?= $user['total_docs'] ?>
                                         </span>
                                     </div>
                                 </td>
-                                <td>
-                                    <button class="btn btn-primary btn-sm" 
+                                <td class="text-center">
+                                    <button class="btn btn-primary btn-sm px-3" 
                                             onclick="viewDocuments(<?= $user['id'] ?>)">
-                                        View Documents
+                                        <i class="fas fa-file-alt me-1"></i> View Documents
                                     </button>
                                 </td>
                             </tr>
@@ -67,12 +89,22 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="modal fade" id="documentsModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">User Documents</h5>
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-alt me-2"></i>
+                    User Documents
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body">
-                <!-- Documents will be loaded here -->
+                <div class="documents-wrapper">
+                    <!-- Documents will be loaded here -->
+                    <div class="text-center py-5">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -82,12 +114,22 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <div class="modal fade" id="previewModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Document Preview</h5>
+            <div class="modal-header bg-light">
+                <h5 class="modal-title">
+                    <i class="fas fa-file-pdf me-2"></i>
+                    Document Preview
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-0">
-                <iframe id="documentPreview" style="width: 100%; height: 80vh; border: none;"></iframe>
+                <div class="iframe-container">
+                    <iframe id="documentPreview" style="width: 100%; height: 80vh; border: none;"></iframe>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i> Close
+                </button>
             </div>
         </div>
     </div>
@@ -336,5 +378,134 @@ $('#previewModal').on('hidden.bs.modal', function () {
         width: 100%;
         margin-bottom: 0.5rem;
     }
+}
+
+.avatar-circle {
+    width: 40px;
+    height: 40px;
+    background-color: #e9ecef;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #495057;
+}
+
+.card.shadow {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15) !important;
+}
+
+.table > :not(caption) > * > * {
+    padding: 1rem 1rem;
+}
+
+.progress {
+    background-color: #e9ecef;
+    border-radius: 0.5rem;
+}
+
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+}
+
+.btn-sm {
+    padding: 0.4rem 1rem;
+    font-size: 0.875rem;
+}
+
+/* Modal Styles */
+.modal-header {
+    border-bottom: 1px solid #dee2e6;
+    background-color: #f8f9fa;
+}
+
+.modal-title {
+    display: flex;
+    align-items: center;
+    color: #2c3e50;
+    font-weight: 500;
+}
+
+.documents-wrapper {
+    min-height: 300px;
+}
+
+.document-card {
+    background: #fff;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.document-card:hover {
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    transform: translateY(-1px);
+}
+
+.document-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.document-title {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0;
+}
+
+.iframe-container {
+    position: relative;
+    background: #f8f9fa;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.modal-footer {
+    background-color: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+}
+
+/* Loading Spinner */
+.spinner-border {
+    width: 3rem;
+    height: 3rem;
+}
+
+/* Document Status Badges */
+.badge {
+    padding: 0.5em 1em;
+    font-weight: 500;
+    text-transform: capitalize;
+}
+
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Document Action Buttons */
+.btn-group-sm > .btn, .btn-sm {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.875rem;
+    border-radius: 0.2rem;
+}
+
+.btn i {
+    margin-right: 0.25rem;
 }
 </style> 
