@@ -40,6 +40,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 }
 ?>
 
+<head>
+    <!-- Your other head elements -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script><head>
+    <!-- Add jQuery before SweetAlert2 -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+    
+</head>
+
 <div class="landing-container">
     <main class="main-content">
         <!-- Parish Information Section -->
@@ -158,7 +167,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             <!-- Register Form -->
             <div class="auth-tab-content hidden" id="register-tab">
-                <form method="POST" class="auth-form" id="registerForm">
+                                    <form method="POST" class="auth-form" id="registerForm">
+                                    <div class="form-group">
+                        <label for="first-name">First Name</label>
+                        <input type="text" id="first-name" name="first_name" class="form-control" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" id="last-name" name="last_name" class="form-control" required>
+                    </div>
                     <div class="form-group">
                         <label for="reg-email">Email Address</label>
                         <input type="email" id="reg-email" name="email" class="form-control" required>
@@ -182,3 +200,67 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
         </div>
     </aside>
 </div>
+<script>
+$(document).ready(function() {
+    // Switch between login and register tabs
+    $('.auth-tab-btn').click(function() {
+        const tab = $(this).data('tab');
+        $('.auth-tab-btn').removeClass('active');
+        $(this).addClass('active');
+        $('.auth-tab-content').addClass('hidden');
+        $(`#${tab}-tab`).removeClass('hidden');
+    });
+
+    // Handle registration form submission
+    $('#registerForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        // Check if passwords match
+        const password = $('#reg-password').val();
+        const confirmPassword = $('#confirm-password').val();
+        
+        if (password !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Password Mismatch',
+                text: 'Passwords do not match!'
+            });
+            return;
+        }
+
+        $.ajax({
+            url: 'ajax/register.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Switch to login tab
+                            $('.auth-tab-btn[data-tab="login"]').click();
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong. Please try again.'
+                });
+            }
+        });
+    });
+});
+</script>
