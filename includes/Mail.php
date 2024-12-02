@@ -71,4 +71,42 @@ class Mail {
             return false;
         }
     }
+
+    public function sendBookingRejection($userEmail, $bookingDetails, $reason) {
+        try {
+            if (!$userEmail || !$bookingDetails || !$reason) {
+                throw new Exception('Missing required email, booking details, or reason');
+            }
+
+            $this->mailer->clearAddresses();
+            $this->mailer->addAddress($userEmail);
+
+            $this->mailer->Subject = 'Your Wedding Booking Has Been Rejected';
+            $this->mailer->Body = "
+                <div style='font-family: Arial, sans-serif; color: #333; line-height: 1.8; max-width: 600px; margin: 0 auto; background-color: #f4f4f9; padding: 20px;'>
+                    <div style='background-color: #fff; border: 1px solid #ddd; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); padding: 30px;'>
+                        <h2 style='color: #FF0000; text-align: center; font-size: 24px;'><i class='fas fa-exclamation-circle'></i> Important Notice Regarding Your Wedding Booking</h2>
+                        <p style='font-size: 16px;'>Dear <strong>{$bookingDetails['groom_name']}</strong> and <strong>{$bookingDetails['bride_name']}</strong>,</p>
+                        <p style='font-size: 16px;'>We regret to inform you that your wedding booking has been rejected. Below is the reason provided by our admin:</p>
+                        <div style='background-color: #f9f9f9; padding: 15px; border-radius: 5px; margin: 20px 0;'>
+                            <p style='margin: 0; font-size: 16px;'><strong>Reason for Rejection:</strong> {$reason}</p>
+                        </div>
+                        <p style='font-size: 16px;'>Please feel free to contact us for further assistance or clarification.</p>
+                        <p style='margin-top: 20px; font-size: 16px;'>Warm regards,</p>
+                        <p style='font-weight: bold; font-size: 16px;'>St. Rita Parish Wedding Station</p>
+                    </div>
+                </div>
+            ";
+
+            $success = $this->mailer->send();
+            if (!$success) {
+                throw new Exception($this->mailer->ErrorInfo);
+            }
+            return true;
+        } catch (Exception $e) {
+            $this->error = $e->getMessage();
+            error_log("Mail Error: {$this->error}");
+            return false;
+        }
+    }
 } 

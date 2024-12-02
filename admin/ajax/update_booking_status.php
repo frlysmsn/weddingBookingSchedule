@@ -60,6 +60,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 error_log("Failed to send email: " . $mailer->getError());
             }
         }
+                // Send email if booking is rejected
+        if ($status === 'rejected' && !empty($booking['user_email'])) {
+            $mailer = new Mail();
+            if ($mailer->sendBookingRejection($booking['user_email'], $booking, $reason)) {
+                error_log("Rejection email sent successfully to " . $booking['user_email']);
+            } else {
+                error_log("Failed to send rejection email: " . $mailer->getError());
+            }
+        }
+
         
         $db->commit();
         echo json_encode(['success' => true]);
