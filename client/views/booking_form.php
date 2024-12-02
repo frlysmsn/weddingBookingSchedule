@@ -6,34 +6,42 @@ if(!isset($_SESSION['user_id'])) {
 
 $db = Database::getInstance()->getConnection();
 
-// Check document approval status
-$stmt = $db->prepare("
-    SELECT 
-        COUNT(*) as total_docs,
-        SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_docs
-    FROM documents 
-    WHERE user_id = ?
-");
+// Check for pending bookings first
+$stmt = $db->prepare("SELECT status FROM bookings WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
 $stmt->execute([$_SESSION['user_id']]);
-$doc_status = $stmt->fetch(PDO::FETCH_ASSOC);
+$lastBooking = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$all_docs_approved = ($doc_status['total_docs'] > 0 && 
-                     $doc_status['approved_docs'] == $doc_status['total_docs']);
+// Check if user has a pending booking
+$hasPendingBooking = $lastBooking && $lastBooking['status'] === 'pending';
 
-// Progress tracker value (2 for registered users with pending docs, 3 for approved docs)
-$progress = 1;
-if ($doc_status['total_docs'] > 0) {
-    $progress = 2;
-    if ($all_docs_approved) {
-        $progress = 3;
+// Only check documents if no pending booking
+if (!$hasPendingBooking) {
+    // Check document approval status
+    $stmt = $db->prepare("
+        SELECT 
+            COUNT(*) as total_docs,
+            SUM(CASE WHEN status = 'approved' THEN 1 ELSE 0 END) as approved_docs
+        FROM documents 
+        WHERE user_id = ?
+    ");
+    $stmt->execute([$_SESSION['user_id']]);
+    $doc_status = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    $all_docs_approved = ($doc_status['total_docs'] > 0 && 
+                         $doc_status['approved_docs'] == $doc_status['total_docs']);
+
+    // Progress tracker value
+    $progress = 1;
+    if ($doc_status['total_docs'] > 0) {
+        $progress = 2;
+        if ($all_docs_approved) {
+            $progress = 3;
+        }
     }
+} else {
+    // Set progress to 4 if there's a pending booking
+    $progress = 4;
 }
-
-// Get user's email
-$stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
-$userEmail = $user['email'];
 ?>
 
 <!-- Progress Tracker -->
@@ -66,12 +74,23 @@ $userEmail = $user['email'];
     </div>
 </div>
 
-<?php if (!$all_docs_approved): ?>
+<?php if ($hasPendingBooking): ?>
+    <div class="alert alert-info">
+        <h5><i class="fas fa-clock"></i> Booking In Progress</h5>
+        <p>You currently have a pending wedding booking. Please wait for admin approval before making another booking.</p>
+        <a href="index.php?page=bookings" class="btn btn-primary">
+            <i class="fas fa-eye"></i> View My Booking
+        </a>
+    </div>
+<?php elseif (!$all_docs_approved): ?>
     <div class="alert alert-warning">
         <h5><i class="fas fa-exclamation-triangle"></i> Document Requirements</h5>
         <p>Please complete the document requirements before proceeding with the wedding details. 
-       <b><p style="color: red;"> Note: Wait for the staff/admin to approve in order to proceed to the next step.</p></b>
-           Current progress: <b> <?= $doc_status['approved_docs'] ?>/<?= $doc_status['total_docs'] ?></b> documents approved.</p>
+        <b><p style="color: red;"> Note: Wait for the staff/admin to approve in order to proceed to the next step.</p></b>
+        Current progress: <b><?= $doc_status['approved_docs'] ?>/<?= $doc_status['total_docs'] ?></b> documents approved.</p>
+        <a href="index.php?page=documents" class="btn btn-primary">
+            <i class="fas fa-file"></i> Manage Documents
+        </a>
     </div>
 <?php else: ?>
     <div class="row">
@@ -646,6 +665,11 @@ $userEmail = $user['email'];
                     console.log('Success Response:', response);
                     
                     if (response && response.status === 'success') {
+                        // Update progress tracker
+                        $('.step').removeClass('active');
+                        $('.step:last-child').addClass('active');
+                        $('.progress-bar').css('width', '100%');
+                        
                         Swal.fire({
                             icon: 'success',
                             title: 'Success!',

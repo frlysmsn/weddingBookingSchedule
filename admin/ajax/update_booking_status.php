@@ -70,7 +70,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        
+        if ($status === 'approved' || $status === 'rejected') {
+            // Reset progress for new booking
+            $stmt = $db->prepare("
+                UPDATE users 
+                SET booking_progress = 3 
+                WHERE id = (SELECT user_id FROM bookings WHERE id = ?)
+            ");
+            $stmt->execute([$booking_id]);
+        }
+
         $db->commit();
         echo json_encode(['success' => true]);
     } catch (Exception $e) {

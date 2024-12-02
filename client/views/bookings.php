@@ -11,6 +11,22 @@ $query = "SELECT * FROM bookings WHERE user_id = ? ORDER BY created_at DESC";
 $stmt = $db->prepare($query);
 $stmt->execute([$_SESSION['user_id']]);
 $bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+// Add this near the top after fetching bookings
+$hasActivePending = false;
+foreach ($bookings as $booking) {
+    if ($booking['status'] === 'pending') {
+        $hasActivePending = true;
+        break;
+    }
+}
+
+// Update progress if there's a pending booking
+if ($hasActivePending) {
+    $_SESSION['booking_progress'] = 4;
+} else {
+    $_SESSION['booking_progress'] = 3;
+}
 ?>
 
 <div class="container-fluid">
