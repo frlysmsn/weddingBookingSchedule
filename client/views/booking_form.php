@@ -83,14 +83,22 @@ $userEmail = $user['email'];
                 </div>
                 <div class="card-body">
                     <div id="weddingCalendar"></div>
-                    <div class="mt-3">
-                        <div class="d-flex align-items-center mb-2">
-                            <span class="badge bg-danger me-2">&nbsp;</span>
-                            <small>Booked Date</small>
+                    <div class="calendar-legend mt-3">
+                        <div class="legend-item">
+                            <div class="legend-color available"></div>
+                            <span>Available</span>
                         </div>
-                        <div class="d-flex align-items-center">
-                            <span class="badge bg-success me-2">&nbsp;</span>
-                            <small>Available Date</small>
+                        <div class="legend-item">
+                            <div class="legend-color fully-booked"></div>
+                            <span>Fully Booked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color partially-booked"></div>
+                            <span>Partially Booked</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color sunday"></div>
+                            <span>Sunday</span>
                         </div>
                     </div>
                 </div>
@@ -527,33 +535,78 @@ $userEmail = $user['email'];
 
     <script>
     $(document).ready(function() {
-        // Initialize FullCalendar
-        const calendar = new FullCalendar.Calendar(document.getElementById('weddingCalendar'), {
+        const calendarEl = document.getElementById('weddingCalendar');
+        if (!calendarEl) return;
+
+        const calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             selectable: true,
-            selectConstraint: {
-                start: new Date(), // Can't select dates before today
+            headerToolbar: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'dayGridMonth'
             },
-            events: 'ajax/get_booked_dates.php', // Endpoint to get booked dates
+            events: {
+                url: 'ajax/get_booked_dates.php',
+                method: 'GET',
+                failure: function(error) {
+                    console.error('Error details:', error);
+                }
+            },
             select: function(info) {
                 const selectedDate = info.startStr;
-                const dateInput = $('#wedding_date');
-                dateInput.val(selectedDate);
+                $('#wedding_date').val(selectedDate);
                 
-                // Highlight the selected date
-                $('.fc-day').removeClass('selected');
-                $(info.dayEl).addClass('selected');
-            },
-            eventDidMount: function(info) {
-                // Add tooltip showing it's booked
-                if(info.event.title === 'Booked') {
-                    $(info.el).tooltip({
-                        title: 'This date is already booked',
-                        placement: 'top'
-                    });
-                }
+                // Clear previous selection
+                $('.selected-date').removeClass('selected-date');
+                $(info.dayEl).addClass('selected-date');
+                
+                // Fetch available times
+                $.ajax({
+                    url: 'ajax/get_available_times.php',
+                    method: 'GET',
+                    dataType: 'json',
+                    data: { date: selectedDate },
+                    success: function(response) {
+                        console.log('Response:', response); // Debug log
+                        
+                        const timeSelect = $('select[name="preferred_time"]');
+                        timeSelect.empty();
+                        timeSelect.append('<option value="">Select Time Slot</option>');
+                        
+                        if (response.success) {
+                            // Get the booked times array
+                            const bookedTimes = response.booked_times || [];
+                            console.log('Booked times:', bookedTimes); // Debug log
+                            
+                            // Define available time slots with database format
+                            const timeSlots = {
+                                '08:00:00': '8:00 AM - 9:00 AM',
+                                '09:00:00': '9:00 AM - 10:00 AM',
+                                '13:00:00': '1:00 PM - 2:00 PM'
+                            };
+                            
+                            // Only add unbooked time slots to the dropdown
+                            Object.entries(timeSlots).forEach(([value, label]) => {
+                                if (!bookedTimes.includes(value)) {
+                                    timeSelect.append(`<option value="${value}">${label}</option>`);
+                                }
+                            });
+                        }
+                        
+                        timeSelect.prop('disabled', false);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Ajax error:', error); // Debug log
+                        const timeSelect = $('select[name="preferred_time"]');
+                        timeSelect.empty()
+                            .append('<option value="">Error loading time slots</option>')
+                            .prop('disabled', true);
+                    }
+                });
             }
         });
+        
         calendar.render();
 
         // When "Proceed to Confirmation" is clicked
@@ -600,7 +653,7 @@ $userEmail = $user['email'];
                             confirmButtonColor: '#4e73df'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                window.location.href = 'index.php?page=booking_status';
+                                window.location.href = 'index.php?page=bookings';
                             }
                         });
                     } else {
@@ -731,102 +784,190 @@ $userEmail = $user['email'];
 
 <!-- Make sure these are in your header -->
 <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 
 <style>
+/* Calendar container */
 #weddingCalendar {
     margin: 0 auto;
-    max-width: 800px;
+    max-width: 100%;
     background: white;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    font-family: 'Arial', sans-serif;
 }
 
-.fc {
-    font-family: inherit;
+/* Header toolbar styling */
+.fc-header-toolbar {
+    margin-bottom: 1em !important;
+    padding: 0.8em;
+    background: #f8f9fa;
+    border-radius: 4px;
 }
 
-.fc .fc-toolbar-title {
-    font-size: 1.25em;
-    color: #4e73df;
+.fc-toolbar-title {
+    font-size: 1.2rem !important;
+    font-weight: 600;
 }
 
-.fc .fc-button-primary {
-    background-color: #4e73df;
-    border-color: #4e73df;
+/* Button styling */
+.fc-button {
+    padding: 8px 12px !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    text-transform: capitalize !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05) !important;
 }
 
-.fc .fc-button-primary:hover {
-    background-color: #2e59d9;
-    border-color: #2e59d9;
+.fc-today-button {
+    background-color: #2196F3 !important;
+    border-color: #2196F3 !important;
 }
 
-.fc-day-today {
-    background-color: #e8f4ff !important;
+.fc-prev-button, .fc-next-button {
+    background-color: #fff !important;
+    border-color: #dee2e6 !important;
+    color: #495057 !important;
 }
 
-.fc-day-past {
-    background-color: #f8f9fa;
+/* Day header styling */
+.fc-col-header-cell {
+    background: #f8f9fa;
+    padding: 12px 0 !important;
+    font-size: 0.9rem;
+    font-weight: 600;
 }
 
-.fc td {
-    border: 1px solid #dee2e6;
+/* Day cell styling */
+.fc-daygrid-day {
+    padding: 4px !important;
 }
 
-/* Weekend days */
-.fc-day-sat, .fc-day-sun {
-    background-color: #f8f9fa;
-}
-
-/* Available dates */
-.fc-day-future:not(.fc-day-other) {
-    background-color: #e8f5e9;
-    cursor: pointer;
-}
-
-/* Hover effect on available dates */
-.fc-day-future:not(.fc-day-other):hover {
-    background-color: #c8e6c9;
-}
-
-/* Reserved dates */
-.fc-daygrid-day.fc-day-future.reserved {
-    background-color: #ffebee !important;
-    cursor: not-allowed;
-}
-
-/* Selected date */
-.fc-daygrid-day.selected {
-    background-color: #cfe2ff !important;
-}
-
-/* Other month dates */
-.fc-day-other {
-    background-color: #f5f5f5;
-}
-
-#selectedDateDisplay {
-    background-color: #cfe2ff;
-    border-color: #b6d4fe;
-    color: #084298;
-}
-
-.fc .fc-daygrid-day-number {
+.fc-daygrid-day-number {
+    font-size: 0.95rem !important;
+    padding: 8px !important;
     font-weight: 500;
-    color: #495057;
 }
 
-/* Today's date */
-.fc .fc-daygrid-day.fc-day-today .fc-daygrid-day-number {
-    background-color: #4e73df;
+/* Today's date styling */
+.fc-day-today .fc-daygrid-day-number {
+    background: #2196F3;
     color: white;
     border-radius: 50%;
-    width: 24px;
-    height: 24px;
+    width: 28px;
+    height: 28px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin: 4px;
 }
-</style> 
+
+/* Event styling */
+.fc-event {
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .fc-toolbar-title {
+        font-size: 1rem !important;
+    }
+    
+    .fc-button {
+        padding: 6px 10px !important;
+        font-size: 0.8rem !important;
+    }
+    
+    .fc-daygrid-day-number {
+        font-size: 0.85rem !important;
+    }
+}
+
+/* Legend styles */
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 0.8rem;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+}
+
+/* Calendar date colors - matching with legend */
+.legend-color.available { background-color: #ffffff; border: 1px solid #ddd; }
+.legend-color.fully-booked { background-color: #ffcdd2; }
+.legend-color.partially-booked { background-color: #fff3cd; }
+.legend-color.sunday { background-color: #e3f2fd; }
+
+/* Calendar date states */
+.fc-day-future:not(.fc-day-sun):not(.booked-date) { background-color: #ffffff !important; }
+.fc-day-today { background-color: #e8f5e9 !important; }
+.fully-booked-date { background-color: #ffcdd2 !important; }
+.partially-booked-date { background-color: #fff3cd !important; }
+.fc-day-sun { background-color: #e3f2fd !important; }
+.selected-date { border: 2px solid #1976d2 !important; }
+
+/* Clean up calendar header */
+.fc-header-toolbar {
+    margin-bottom: 1em !important;
+    padding: 0.5em;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+.fc-day-header {
+    background: #f8f9fa;
+    padding: 8px 0 !important;
+}
+
+.fc-day-number {
+    padding: 8px !important;
+}
+
+.time-slot-chip {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background: rgb(33, 150, 243);
+    color: white;
+    font-size: 0.9rem;
+    display: inline-block;
+    margin: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+}
+
+.time-slot-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+select option:disabled {
+    background-color: #ffebee !important;
+    color: #d32f2f !important;
+    font-style: italic;
+}
+
+select option {
+    padding: 8px;
+}
+</style>
+
+<script src="assets/js/booking_form.js"></script> 

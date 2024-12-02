@@ -1,7 +1,12 @@
 <?php
+session_start();
 require_once '../../includes/database.php';
 
 try {
+    if (!isset($_SESSION['user_id'])) {
+        throw new Exception("User not logged in");
+    }
+
     $db = new Database();
     $conn = $db->getConnection();
     
@@ -14,21 +19,22 @@ try {
     $bride_name = trim($_POST['bride_fname'] . ' ' . $_POST['bride_mname'] . ' ' . $_POST['bride_lname']);
     $groom_name = trim($_POST['groom_fname'] . ' ' . $_POST['groom_mname'] . ' ' . $_POST['groom_lname']);
     
-    // Basic insert with exact parameter count
+    // Add user_id to the SQL query
     $sql = "INSERT INTO bookings (
-        bride_name, bride_dob, bride_birthplace, bride_mother, bride_father,
+        user_id, bride_name, bride_dob, bride_birthplace, bride_mother, bride_father,
         bride_prenup, bride_precana, groom_name, groom_dob, groom_birthplace,
         groom_mother, groom_father, groom_prenup, groom_precana,
         wedding_date, preferred_time, contact_number, email, status
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')";
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending')";
     
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         throw new Exception("Prepare failed: " . $conn->error);
     }
     
-    // Bind exactly 18 parameters
-    $stmt->bind_param("ssssssssssssssssss",
+    // Add user_id to bind_param
+    $stmt->bind_param("issssssssssssssssss",
+        $_SESSION['user_id'],
         $bride_name,
         $_POST['bride_dob'],
         $_POST['bride_birthplace'],
@@ -53,11 +59,13 @@ try {
         throw new Exception("Execute failed: " . $stmt->error);
     }
     
+    $booking_id = $stmt->insert_id;
     mysqli_commit($conn);
     
     echo json_encode([
         'status' => 'success',
-        'message' => 'Booking submitted successfully!'
+        'message' => 'Booking submitted successfully!',
+        'booking_id' => $booking_id
     ]);
 
 } catch (Exception $e) {
