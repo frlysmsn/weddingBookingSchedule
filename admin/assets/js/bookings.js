@@ -10,7 +10,7 @@ $(document).ready(function() {
     $('#completedBookingsTable').DataTable(tableConfig);
 
     // Event handlers using delegation
-    $('#pendingBookingsTable, #completedBookingsTable').on('click', '.view-booking', function() {
+    $('#pendingBookingsTable, #completedBookingsTable, #rejectedBookingsTable').on('click', '.view-booking', function() {
         const bookingId = $(this).data('id');
         viewBookingDetails(bookingId);
     });
@@ -27,7 +27,7 @@ $(document).ready(function() {
     });
 
     // Delete for both tables
-    $('#pendingBookingsTable, #completedBookingsTable').on('click', '.delete-booking', function() {
+    $('#pendingBookingsTable, #completedBookingsTable, #rejectedBookingsTable').on('click', '.delete-booking', function() {
         const bookingId = $(this).data('id');
         deleteBooking(bookingId);
     });

@@ -6,7 +6,7 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $db = Database::getInstance()->getConnection();
 
-// Modify query to separate pending and completed bookings
+// Modify query to separate pending, completed, and rejected bookings
 $stmt = $db->prepare("
     SELECT 
         b.*,
@@ -14,6 +14,7 @@ $stmt = $db->prepare("
         COALESCE(u.email, b.email) as client_email,
         CASE 
             WHEN b.status = 'approved' THEN 'completed'
+            WHEN b.status = 'rejected' THEN 'rejected'
             ELSE 'pending'
         END as booking_type
     FROM bookings b
@@ -26,6 +27,7 @@ $allBookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 // Separate bookings
 $pendingBookings = array_filter($allBookings, fn($b) => $b['booking_type'] === 'pending');
 $completedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] === 'completed');
+$rejectedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] === 'rejected');
 ?>
 
 <div class="container-fluid px-4">
@@ -42,7 +44,7 @@ $completedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] ===
                 <thead>
                     <tr>
                         <th>Email</th>
-                        <th>Preffered Wedding Date</th>
+                        <th>Preferred Wedding Date</th>
                         <th>Preferred Time</th>
                         <th>Booking Status</th>
                         <th>Actions</th>
@@ -110,7 +112,7 @@ $completedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] ===
                 <thead>
                     <tr>
                         <th>Email</th>
-                        <th>Preffered Wedding Date</th>
+                        <th>Preferred Wedding Date</th>
                         <th>Preferred Time</th>
                         <th>Booking Status</th>
                         <th>Actions</th>
@@ -118,6 +120,60 @@ $completedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] ===
                 </thead>
                 <tbody>
                     <?php foreach ($completedBookings as $booking): ?>
+                        <tr>
+                            <td>
+                                <div class="client-info">
+                                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($booking['client_email']) ?>
+                                </div>
+                            </td>
+                            <td><?= date('M d, Y', strtotime($booking['wedding_date'])) ?></td>
+                            <td><?= htmlspecialchars($booking['preferred_time']) ?></td>
+                            <td>
+                                <span class="badge bg-<?= getStatusBadgeClass($booking['status']) ?>">
+                                    <?= ucfirst($booking['status']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-info view-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger delete-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>"
+                                            data-action="delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Rejected Bookings Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">
+            <i class="fas fa-times-circle me-1"></i>
+            Rejected Bookings
+        </div>
+        <div class="card-body">
+            <table id="rejectedBookingsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Preferred Wedding Date</th>
+                        <th>Preferred Time</th>
+                        <th>Booking Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($rejectedBookings as $booking): ?>
                         <tr>
                             <td>
                                 <div class="client-info">
