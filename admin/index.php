@@ -36,6 +36,7 @@ $pending_bookings = $stmt->fetchColumn();
     <!-- Custom CSS -->
     <link href="assets/css/admin.css" rel="stylesheet">
     <link href="assets/css/sidebar.css" rel="stylesheet">
+    
 </head>
 <body>
     <!-- Mobile Toggle -->
@@ -122,6 +123,7 @@ $pending_bookings = $stmt->fetchColumn();
     <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.1/dist/sweetalert2.all.min.js"></script>
     <script src="assets/js/admin.js"></script>
+    
     <script>
 $(document).ready(function() {
     // Initialize DataTables

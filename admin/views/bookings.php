@@ -6,193 +6,174 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 
 $db = Database::getInstance()->getConnection();
 
-// Check document approval status
-$stmt = $db->prepare("
-    SELECT 
-        COUNT(*) as total_docs,
-        SUM(CASE WHEN d.status = 'approved' THEN 1 ELSE 0 END) as approved_docs
-    FROM documents d
-    WHERE d.user_id = ?
-");
-$stmt->execute([$_SESSION['user_id']]);
-$doc_status = $stmt->fetch(PDO::FETCH_ASSOC);
-
-$all_docs_approved = ($doc_status['total_docs'] > 0 && 
-                     $doc_status['approved_docs'] == $doc_status['total_docs']);
-
-// Progress tracker value (2 for registered users with pending docs, 3 for approved docs)
-$progress = 1;
-if ($doc_status['total_docs'] > 0) {
-    $progress = 2;
-    if ($all_docs_approved) {
-        $progress = 3;
-    }
-}
-
-// Get all bookings with user details
+// Modify query to separate pending and completed bookings
 $stmt = $db->prepare("
     SELECT 
         b.*,
-        u.name as client_name,
-        u.email as client_email,
-        (SELECT COUNT(*) FROM documents d WHERE d.user_id = u.id AND d.status = 'approved') as approved_docs
+        COALESCE(u.name, 'N/A') as client_name,
+        COALESCE(u.email, b.email) as client_email,
+        CASE 
+            WHEN b.status = 'approved' THEN 'completed'
+            ELSE 'pending'
+        END as booking_type
     FROM bookings b
-    JOIN users u ON b.user_id = u.id
-    ORDER BY b.wedding_date ASC
+    LEFT JOIN users u ON b.user_id = u.id
+    ORDER BY b.created_at DESC
 ");
 $stmt->execute();
-$bookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$allBookings = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// Get users with pending documents
-$stmt = $db->query("
-    SELECT DISTINCT 
-        u.id,
-        u.name,
-        u.email,
-        b.wedding_date,
-        (SELECT COUNT(*) FROM documents d2 WHERE d2.user_id = u.id AND d2.status = 'pending') as pending_docs,
-        (SELECT COUNT(*) FROM documents d3 WHERE d3.user_id = u.id) as total_docs
-    FROM users u
-    JOIN bookings b ON u.id = b.user_id
-    JOIN documents d ON d.user_id = u.id
-    WHERE d.status = 'pending'
-    ORDER BY b.wedding_date ASC
-");
-$users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
+// Separate bookings
+$pendingBookings = array_filter($allBookings, fn($b) => $b['booking_type'] === 'pending');
+$completedBookings = array_filter($allBookings, fn($b) => $b['booking_type'] === 'completed');
 ?>
 
-<div class="container-fluid">
-    <h2 class="mb-4">Wedding Bookings</h2>
+<div class="container-fluid px-4">
+    <h1 class="mt-4">Wedding Bookings</h1>
     
-    <div class="card">
+    <!-- Pending Bookings Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <i class="fas fa-clock me-1"></i>
+            Pending Bookings
+        </div>
         <div class="card-body">
-            <div class="table-responsive">
-                <table id="bookingsTable" class="table table-striped">
-                    <thead>
+            <table id="pendingBookingsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Preffered Wedding Date</th>
+                        <th>Preferred Time</th>
+                        <th>Booking Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($pendingBookings as $booking): ?>
                         <tr>
-                            <th>Booking ID</th>
-                            <th>Couple Names</th>
-                            <th>Wedding Date</th>
-                            <th>Status</th>
-                            <th>Documents</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach($bookings as $booking): ?>
-                            <tr>
-                                <td><?= $booking['id'] ?></td>
-                                <td>
-                                    <strong>Groom:</strong> <?= htmlspecialchars($booking['groom_name']) ?><br>
-                                    <strong>Bride:</strong> <?= htmlspecialchars($booking['bride_name']) ?>
-                                </td>
-                                <td>
-                                    <?= date('F d, Y', strtotime($booking['wedding_date'])) ?><br>
-                                    <small><?= date('h:i A', strtotime($booking['preferred_time'])) ?></small>
-                                </td>
-                                <td>
-                                    <span class="badge bg-<?= getStatusBadgeClass($booking['status']) ?>">
-                                        <?= ucwords(str_replace('_', ' ', $booking['status'])) ?>
-                                    </span>
-                                </td>
-                                <td>
-                                    <div class="progress" style="height: 20px;">
-                                        <div class="progress-bar" role="progressbar" 
-                                             style="width: <?= $booking['document_progress'] ?>%">
-                                            <?= $booking['document_progress'] ?>%
-                                        </div>
-                                    </div>
-                                </td>
-                                <td>
-                                    <button class="btn btn-info btn-sm view-details" 
-                                            data-id="<?= $booking['id'] ?>"
-                                            data-bs-toggle="modal" 
-                                            data-bs-target="#viewDetailsModal">
-                                        <i class="fas fa-eye"></i> View
+                            <td>
+                                <div class="client-info">
+                                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($booking['client_email']) ?>
+                                </div>
+                            </td>
+                            <td><?= date('M d, Y', strtotime($booking['wedding_date'])) ?></td>
+                            <td><?= htmlspecialchars($booking['preferred_time']) ?></td>
+                            <td>
+                                <span class="badge bg-<?= getStatusBadgeClass($booking['status']) ?>">
+                                    <?= ucfirst($booking['status']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-info view-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>">
+                                        <i class="fas fa-eye"></i>
                                     </button>
                                     <?php if($booking['status'] === 'pending'): ?>
-                                        <button class="btn btn-danger btn-sm reject-booking" 
-                                                data-id="<?= $booking['id'] ?>">
-                                            <i class="fas fa-times"></i> Reject
+                                        <button type="button" 
+                                                class="btn btn-sm btn-success approve-booking" 
+                                                data-id="<?= htmlspecialchars($booking['id']) ?>"
+                                                data-action="approve">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button type="button" 
+                                                class="btn btn-sm btn-danger reject-booking" 
+                                                data-id="<?= htmlspecialchars($booking['id']) ?>"
+                                                data-action="reject">
+                                            <i class="fas fa-times"></i>
                                         </button>
                                     <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger delete-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>"
+                                            data-action="delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Completed Bookings Table -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">
+            <i class="fas fa-check-circle me-1"></i>
+            Completed Bookings
+        </div>
+        <div class="card-body">
+            <table id="completedBookingsTable" class="table table-striped table-bordered">
+                <thead>
+                    <tr>
+                        <th>Email</th>
+                        <th>Preffered Wedding Date</th>
+                        <th>Preferred Time</th>
+                        <th>Booking Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($completedBookings as $booking): ?>
+                        <tr>
+                            <td>
+                                <div class="client-info">
+                                    <i class="fas fa-envelope"></i> <?= htmlspecialchars($booking['client_email']) ?>
+                                </div>
+                            </td>
+                            <td><?= date('M d, Y', strtotime($booking['wedding_date'])) ?></td>
+                            <td><?= htmlspecialchars($booking['preferred_time']) ?></td>
+                            <td>
+                                <span class="badge bg-<?= getStatusBadgeClass($booking['status']) ?>">
+                                    <?= ucfirst($booking['status']) ?>
+                                </span>
+                            </td>
+                            <td>
+                                <div class="btn-group">
+                                    <button type="button" 
+                                            class="btn btn-sm btn-info view-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-danger delete-booking" 
+                                            data-id="<?= htmlspecialchars($booking['id']) ?>"
+                                            data-action="delete">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
 
-<!-- View Details Modal -->
-<div class="modal fade" id="viewDetailsModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Booking Details</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <!-- Content will be loaded dynamically -->
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
+<?php
+function getProgressBarClass($progress) {
+    if ($progress >= 100) return 'bg-success';
+    if ($progress >= 50) return 'bg-info';
+    if ($progress >= 25) return 'bg-warning';
+    return 'bg-danger';
+}
 
-<script>
-$(document).ready(function() {
-    // Initialize DataTable
-    $('#bookingsTable').DataTable({
-        order: [[2, 'desc']], // Sort by wedding date
-        responsive: true
-    });
+function getStatusBadgeClass($status) {
+    switch ($status) {
+        case 'approved': return 'success';
+        case 'pending': return 'warning';
+        case 'rejected': return 'danger';
+        default: return 'secondary';
+    }
+}
+?>
 
-    // View Details
-    $('.view-details').click(function() {
-        const bookingId = $(this).data('id');
-        $.get('../api/get-booking-details.php', { booking_id: bookingId })
-            .done(function(response) {
-                $('#viewDetailsModal .modal-body').html(response);
-            });
-    });
-
-    // Reject Booking
-    $('.reject-booking').click(function() {
-        const bookingId = $(this).data('id');
-        Swal.fire({
-            title: 'Reject Booking?',
-            text: 'Please provide a reason for rejection:',
-            input: 'text',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#dc3545',
-            confirmButtonText: 'Reject',
-            inputValidator: (value) => {
-                if (!value) {
-                    return 'You need to provide a reason!';
-                }
-            }
-        }).then((result) => {
-            if (result.isConfirmed) {
-                $.post('../api/update-booking-status.php', {
-                    booking_id: bookingId,
-                    status: 'rejected',
-                    reason: result.value
-                })
-                .done(function(response) {
-                    Swal.fire('Rejected!', 'Booking has been rejected.', 'success')
-                        .then(() => location.reload());
-                })
-                .fail(function() {
-                    Swal.fire('Error!', 'Failed to reject booking.', 'error');
-                });
-            }
-        });
-    });
-});
-</script> 
+<!-- Move scripts to the bottom and ensure correct order -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+<script src="assets/js/bookings.js"></script>

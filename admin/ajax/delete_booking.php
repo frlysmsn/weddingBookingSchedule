@@ -13,27 +13,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $db = Database::getInstance()->getConnection();
     
     $booking_id = $_POST['booking_id'] ?? null;
-    $status = $_POST['status'] ?? null;
-    $reason = $_POST['reason'] ?? null;
     
-    if (!$booking_id || !$status) {
-        echo json_encode(['success' => false, 'error' => 'Missing required parameters']);
+    if (!$booking_id) {
+        echo json_encode(['success' => false, 'error' => 'Missing booking ID']);
         exit;
     }
     
     try {
         $db->beginTransaction();
         
-        // Update booking status
-        $stmt = $db->prepare("UPDATE bookings SET status = ? WHERE id = ?");
-        $stmt->execute([$status, $booking_id]);
+        // First, delete related records in booking_actions
+        $stmt = $db->prepare("DELETE FROM booking_actions WHERE booking_id = ?");
+        $stmt->execute([$booking_id]);
         
-        // Record the action
-        $stmt = $db->prepare("
-            INSERT INTO booking_actions (booking_id, action_type, acted_by, reason) 
-            VALUES (?, ?, ?, ?)
-        ");
-        $stmt->execute([$booking_id, $status, $_SESSION['user_id'], $reason]);
+        // Then delete the booking
+        $stmt = $db->prepare("DELETE FROM bookings WHERE id = ?");
+        $stmt->execute([$booking_id]);
         
         $db->commit();
         echo json_encode(['success' => true]);
@@ -41,4 +36,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $db->rollBack();
         echo json_encode(['success' => false, 'error' => $e->getMessage()]);
     }
-} 
+}

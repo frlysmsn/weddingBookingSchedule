@@ -28,6 +28,12 @@ if ($doc_status['total_docs'] > 0) {
         $progress = 3;
     }
 }
+
+// Get user's email
+$stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$user = $stmt->fetch(PDO::FETCH_ASSOC);
+$userEmail = $user['email'];
 ?>
 
 <!-- Progress Tracker -->
@@ -310,7 +316,7 @@ if ($doc_status['total_docs'] > 0) {
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label>Email Address</label>
-                                    <input type="email" class="form-control" name="email" required>
+                                    <input type="email" class="form-control" name="email" value="<?= htmlspecialchars($userEmail) ?>" readonly>
                                 </div>
                             </div>
                         </div>
