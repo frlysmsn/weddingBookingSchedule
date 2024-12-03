@@ -1,4 +1,5 @@
 <?php
+
 // Database configuration
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');  // Change this
@@ -7,7 +8,7 @@ define('DB_NAME', 'st_rita_wedding');
 
 // Email configuration
 define('SMTP_HOST', 'smtp.gmail.com');
-define('SMTP_USER', 'your-email@gmail.com');  // Change this
+define('SMTP_USER', 'your-email.com');  // Change this
 define('SMTP_PASS', 'your-app-password');     // Change this
 define('SMTP_PORT', 587);
 

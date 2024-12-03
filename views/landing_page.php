@@ -1,5 +1,4 @@
 <?php
-$error = '';
 $auth = new Authentication();
 
 // If already logged in, redirect to appropriate dashboard
@@ -10,33 +9,6 @@ if ($auth->isLoggedIn()) {
         header('Location: client/');
     }
     exit;
-}
-
-// Handle client login
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
-    $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
-    $password = $_POST['password'];
-
-    $db = Database::getInstance()->getConnection();
-    $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
-    $stmt->execute([$email]);
-    $user = $stmt->fetch();
-
-    if ($user && password_verify($password, $user['password'])) {
-        // Check if user is active
-        if (!$user['active']) {
-            $error = "Your account has been disabled. Please contact the administrator.";
-        } else {
-            $_SESSION['user_id'] = $user['id'];
-            $_SESSION['role'] = $user['role'];
-            $_SESSION['name'] = $user['name'];
-            
-            header('Location: client/');
-            exit;
-        }
-    } else {
-        $error = "Invalid email or password";
-    }
 }
 ?>
 
@@ -140,11 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
 
             <!-- Login Form -->
             <div class="auth-tab-content" id="login-tab">
-                <?php if ($error): ?>
-                    <div class="alert alert-danger"><?= $error ?></div>
-                <?php endif; ?>
-
-                <form method="POST" class="auth-form">
+                <form id="loginForm" class="auth-form">
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" class="form-control" required>
@@ -156,11 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['login'])) {
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" name="login" class="btn btn-primary btn-block">Login</button>
-                    </div>
-
-                    <div class="auth-links">
-                        <p><small>For admin login, please visit the <a href="admin/login.php">admin portal</a></small></p>
+                        <button type="submit" name="login" class="btn btn-primary">Login</button>
                     </div>
                 </form>
             </div>
@@ -240,24 +204,61 @@ $(document).ready(function() {
                         title: 'Success!',
                         text: response.message
                     }).then((result) => {
-                        if (result.isConfirmed) {
-                            // Switch to login tab
-                            $('.auth-tab-btn[data-tab="login"]').click();
+                        if (result.isConfirmed && response.redirect) {
+                            window.location.href = response.redirect;
                         }
                     });
                 } else {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error!',
+                        text: response.message || 'An error occurred during registration.'
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('Registration error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Something went wrong during registration. Please try again.'
+                });
+            }
+        });
+    });
+
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            url: 'ajax/login.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    if (response.verified) {
+                        window.location.href = response.redirect;
+                    }
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
                         text: response.message
                     });
+                    
+                    if (response.message === 'Please verify your email first.') {
+                        setTimeout(function() {
+                            window.location.href = 'index.php?page=verify';
+                        }, 2000);
+                    }
                 }
             },
             error: function() {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error!',
-                    text: 'Something went wrong. Please try again.'
+                    title: 'Error',
+                    text: 'An error occurred. Please try again.'
                 });
             }
         });

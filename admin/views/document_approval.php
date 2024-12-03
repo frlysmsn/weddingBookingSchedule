@@ -38,7 +38,7 @@ $users_with_docs = $stmt->fetchAll(PDO::FETCH_ASSOC);
                     </thead>
                     <tbody>
                         <?php foreach($users_with_docs as $user): ?>
-                            <tr>
+                            <tr data-user-id="<?= $user['id'] ?>">
                                 <td>
                                     <div class="d-flex align-items-center">
                                         <div class="avatar-circle">
@@ -184,39 +184,108 @@ function approveDocument(docId) {
         confirmButtonColor: '#28a745'
     }).then((result) => {
         if (result.isConfirmed) {
-            $.post('../api/approve-document.php', {
-                document_id: docId,
-                action: 'approve',
-                remarks: ''
+            // Show loading state
+            Swal.fire({
+                title: 'Processing...',
+                text: 'Please wait while we process your request.',
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            // Make the AJAX request
+            $.ajax({
+                url: '../api/approve-document.php',
+                type: 'POST',
+                data: {
+                    document_id: docId,
+                    action: 'approve',
+                    remarks: ''
+                },
+                dataType: 'json'
             })
             .done(function(response) {
                 if (response.success) {
                     Swal.fire({
                         icon: 'success',
-                        title: 'Approved!',
-                        text: 'Document has been approved and client has been notified.',
-                        timer: 1500
+                        title: 'Success!',
+                        text: response.message || 'Document approved successfully',
+                        timer: 1500,
+                        showConfirmButton: false
                     }).then(() => {
-                        // Refresh the documents list in modal
+                        // Refresh both the modal and main table
                         const userId = $('#documentsModal').data('userId');
-                        viewDocuments(userId);
-                        
-                        // Reload the page instead of trying to update DataTable
-                        window.location.reload();
+                        if (userId) {
+                            viewDocuments(userId);
+                            // Reload the main page to update the progress bar
+                            location.reload();
+                        }
                     });
                 } else {
-                    throw new Error(response.error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.error || 'Failed to approve document'
+                    });
                 }
             })
             .fail(function(xhr) {
+                console.error('Approval Error:', xhr.responseText);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: xhr.responseJSON?.error || 'Failed to approve document.'
+                    text: xhr.responseJSON?.error || 'Failed to approve document. Please try again.'
                 });
             });
         }
     });
+}
+
+// Helper function to update progress bar
+function updateProgressBar(userId, approvedCount, totalCount) {
+    const progress = (totalCount > 0) ? (approvedCount / totalCount) * 100 : 0;
+    const statusClass = progress == 100 ? 'bg-success' : (progress > 0 ? 'bg-warning' : 'bg-danger');
+    
+    $(`tr[data-user-id="${userId}"]`).find('.progress-bar')
+        .removeClass('bg-success bg-warning bg-danger')
+        .addClass(statusClass)
+        .css('width', `${progress}%`)
+        .attr('aria-valuenow', progress);
+        
+    $(`tr[data-user-id="${userId}"]`).find('.badge')
+        .removeClass('bg-success bg-warning bg-danger')
+        .addClass(statusClass)
+        .text(`${approvedCount}/${totalCount}`);
+}
+
+// Function to refresh documents list
+function viewDocuments(userId) {
+    const modal = $('#documentsModal');
+    modal.data('userId', userId);
+    
+    $('.documents-wrapper').html(`
+        <div class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    `);
+    
+    modal.modal('show');
+    
+    $.get('../api/get-user-documents.php', { user_id: userId })
+        .done(function(response) {
+            $('.documents-wrapper').html(response);
+        })
+        .fail(function() {
+            $('.documents-wrapper').html(`
+                <div class="alert alert-danger">
+                    Failed to load documents. Please try again.
+                </div>
+            `);
+        });
 }
 
 function rejectDocument(docId) {
@@ -250,35 +319,47 @@ function rejectDocument(docId) {
                 remarks: result.value
             })
             .done(function(response) {
-                if (response.success) {
+                // Parse response if it's a string
+                if (typeof response === 'string') {
+                    try {
+                        response = JSON.parse(response);
+                    } catch (e) {
+                        console.error('Failed to parse response:', e);
+                    }
+                }
+
+                if (response && response.success) {
                     Swal.fire({
                         icon: 'success',
                         title: 'Rejected!',
-                        text: 'Document has been rejected and client has been notified.',
+                        text: 'Document has been rejected successfully.',
                         timer: 1500
                     }).then(() => {
                         // Refresh the documents list in modal
                         const userId = $('#documentsModal').data('userId');
                         viewDocuments(userId);
                         
-                        // Reload the page instead of trying to update DataTable
+                        // Reload the page to update the table
                         window.location.reload();
                     });
                 } else {
-                    throw new Error(response.error);
+                    throw new Error(response.error || 'Unknown error occurred');
                 }
             })
             .fail(function(xhr) {
+                let errorMessage = 'Failed to reject document.';
+                if (xhr.responseJSON && xhr.responseJSON.error) {
+                    errorMessage = xhr.responseJSON.error;
+                }
                 Swal.fire({
                     icon: 'error',
                     title: 'Error!',
-                    text: xhr.responseJSON?.error || 'Failed to reject document.'
+                    text: errorMessage
                 });
             });
         }
     });
 }
-
 function previewDocument(docId) {
     $('#documentsModal').modal('hide');
     $('#documentPreview').attr('src', `../api/view-document.php?id=${docId}`);

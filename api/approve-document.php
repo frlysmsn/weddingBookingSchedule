@@ -11,29 +11,23 @@ if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
 }
 
 $document_id = filter_input(INPUT_POST, 'document_id', FILTER_VALIDATE_INT);
-$action = filter_input(INPUT_POST, 'action', FILTER_SANITIZE_STRING);
-$remarks = filter_input(INPUT_POST, 'remarks', FILTER_SANITIZE_STRING);
+$action = isset($_POST['action']) ? htmlspecialchars($_POST['action'], ENT_QUOTES, 'UTF-8') : null;
+$remarks = isset($_POST['remarks']) ? htmlspecialchars($_POST['remarks'], ENT_QUOTES, 'UTF-8') : '';
 
 if(!$document_id || !$action) {
     http_response_code(400);
     exit(json_encode(['error' => 'Invalid parameters']));
 }
 
-$db = Database::getInstance()->getConnection();
-
 try {
+    $db = Database::getInstance()->getConnection();
     $db->beginTransaction();
 
-    // First, check if document exists and get related info
+    // Get document and user information
     $stmt = $db->prepare("
-        SELECT 
-            d.*,
-            u.email,
-            u.name as user_name,
-            dr.name as document_name
+        SELECT d.*, u.email, u.name as user_name, u.id as user_id
         FROM documents d
         JOIN users u ON d.user_id = u.id
-        LEFT JOIN document_requirements dr ON d.document_type = dr.document_type
         WHERE d.id = ?
     ");
     
@@ -41,9 +35,9 @@ try {
         throw new Exception('Failed to fetch document information');
     }
     
-    $documentInfo = $stmt->fetch(PDO::FETCH_ASSOC);
+    $doc = $stmt->fetch(PDO::FETCH_ASSOC);
     
-    if (!$documentInfo) {
+    if (!$doc) {
         throw new Exception('Document not found');
     }
 
@@ -70,26 +64,12 @@ try {
         WHERE user_id = ?
     ");
     
-    if (!$stmt->execute([$documentInfo['user_id']])) {
+    if (!$stmt->execute([$doc['user_id']])) {
         throw new Exception('Failed to calculate progress');
     }
     
     $counts = $stmt->fetch(PDO::FETCH_ASSOC);
     $progress = ($counts['total_count'] > 0) ? ($counts['approved_count'] / $counts['total_count']) * 100 : 0;
-
-    // Send email notification
-    $to = $documentInfo['email'];
-    $subject = "Document " . ucfirst($status) . " - St. Rita Parish";
-    
-    $message = "Dear " . $documentInfo['user_name'] . ",\n\n";
-    $message .= "Your document (" . $documentInfo['document_name'] . ") has been " . $status . ".\n";
-    if ($remarks) {
-        $message .= "Remarks: " . $remarks . "\n\n";
-    }
-    $message .= "You can check your document status in your dashboard.\n\n";
-    $message .= "Best regards,\nSt. Rita Parish Team";
-
-    @mail($to, $subject, $message);
 
     $db->commit();
     
@@ -97,15 +77,20 @@ try {
         'success' => true,
         'message' => 'Document has been ' . $status,
         'progress' => $progress,
-        'status' => $status
+        'approved_count' => $counts['approved_count'],
+        'total_count' => $counts['total_count'],
+        'user_id' => $doc['user_id']
     ]);
 
 } catch(Exception $e) {
-    $db->rollBack();
+    if (isset($db)) {
+        $db->rollBack();
+    }
     error_log('Document Processing Error: ' . $e->getMessage());
     http_response_code(500);
     echo json_encode([
+        'success' => false,
         'error' => 'Failed to process document',
         'details' => $e->getMessage()
     ]);
-} 
+}

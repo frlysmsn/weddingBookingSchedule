@@ -9,9 +9,9 @@ class Mail {
     private $error;
 
     public function __construct() {
-        $this->mailer = new PHPMailer(true);
-        
         try {
+            $this->mailer = new PHPMailer(true);
+            
             // Server settings
             $this->mailer->isSMTP();
             $this->mailer->Host = 'smtp.gmail.com';
@@ -27,8 +27,8 @@ class Mail {
             $this->mailer->setFrom('stritaparishwedding@gmail.com', 'St. Rita Parish Wedding Station');
             
         } catch (Exception $e) {
-            $this->error = $e->getMessage();
-            error_log("Mail initialization error: " . $this->error);
+            error_log("Mail Constructor Error: " . $e->getMessage());
+            throw $e;
         }
     }
 
@@ -108,5 +108,56 @@ class Mail {
             error_log("Mail Error: {$this->error}");
             return false;
         }
+    }
+
+    public function sendVerificationCode($email, $code) {
+        try {
+            if (!$this->mailer) {
+                echo "Error: Mailer not initialized properly<br>";
+                throw new Exception('Mailer not initialized properly');
+            }
+
+            echo "Attempting to send email to: " . $email . "<br>";
+            
+            // Clear all recipients first
+            $this->mailer->clearAddresses();
+            $this->mailer->addAddress($email);
+            $this->mailer->Subject = 'Email Verification - St. Rita Parish';
+            
+            // Email template
+            $body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                    <h2>Email Verification</h2>
+                    <p>Thank you for registering with St. Rita Parish Wedding Booking System.</p>
+                    <p>Your verification code is:</p>
+                    <div style='background: #f4f4f4; padding: 15px; text-align: center; font-size: 24px; letter-spacing: 5px; margin: 20px 0;'>
+                        <strong>{$code}</strong>
+                    </div>
+                    <p>Please enter this code to verify your email address.</p>
+                    <p>If you didn't request this verification, please ignore this email.</p>
+                </div>
+            ";
+            
+            $this->mailer->Body = $body;
+            $this->mailer->AltBody = "Your verification code is: {$code}";
+            
+            $result = $this->mailer->send();
+            if (!$result) {
+                echo "Mailer Error: " . $this->mailer->ErrorInfo . "<br>";
+                throw new Exception($this->mailer->ErrorInfo);
+            }
+            echo "Email sent successfully!<br>";
+            return true;
+            
+        } catch (Exception $e) {
+            echo "Exception caught: " . $e->getMessage() . "<br>";
+            $this->error = $e->getMessage();
+            error_log("Mail sending error: " . $this->error);
+            return false;
+        }
+    }
+
+    public function getError() {
+        return $this->error;
     }
 } 

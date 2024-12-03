@@ -44,6 +44,13 @@ switch($page) {
             header('Location: index.php?page=login');
         }
         break;
+    case 'verify':
+        if(isset($_SESSION['temp_user_id'])) {
+            include 'views/verify_email.php';
+        } else {
+            header('Location: index.php');
+        }
+        break;
     default:
         include 'views/404.php';
 }
