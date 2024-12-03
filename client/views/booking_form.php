@@ -6,12 +6,6 @@ if(!isset($_SESSION['user_id'])) {
 
 $db = Database::getInstance()->getConnection();
 
-// Fetch user email
-$stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$userResult = $stmt->fetch(PDO::FETCH_ASSOC);
-$userEmail = $userResult['email'] ?? '';
-
 // Check for pending bookings first
 $stmt = $db->prepare("SELECT status FROM bookings WHERE user_id = ? ORDER BY created_at DESC LIMIT 1");
 $stmt->execute([$_SESSION['user_id']]);
