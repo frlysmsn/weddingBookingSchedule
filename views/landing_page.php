@@ -4,9 +4,9 @@ $auth = new Authentication();
 // If already logged in, redirect to appropriate dashboard
 if ($auth->isLoggedIn()) {
     if ($auth->isAdmin()) {
-        header('Location: admin/');
+        header('Location: index.php?page=admin-dashboard');
     } else {
-        header('Location: client/');
+        header('Location: index.php?page=client-dashboard');
     }
     exit;
 }
@@ -112,7 +112,7 @@ if ($auth->isLoggedIn()) {
 
             <!-- Login Form -->
             <div class="auth-tab-content" id="login-tab">
-                <form id="loginForm" class="auth-form">
+                <form id="loginForm" class="auth-form" method="POST">
                     <div class="form-group">
                         <label for="email">Email Address</label>
                         <input type="email" id="email" name="email" class="form-control" required>
@@ -124,7 +124,14 @@ if ($auth->isLoggedIn()) {
                     </div>
 
                     <div class="form-group">
-                        <button type="submit" name="login" class="btn btn-primary">Login</button>
+                          <button type="submit" name="login" class="btn btn-primary btn-block">Login</button>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <a href="#" id="forgotPasswordLink" class="forgot-password-link">Forgot Password?</a>
+                    </div>
+                    <div class="auth-links">
+                    <p><small>For admin login, please visit the <a href="admin/login.php">admin portal</a></small></p>
                     </div>
                 </form>
             </div>
@@ -164,6 +171,30 @@ if ($auth->isLoggedIn()) {
         </div>
     </aside>
 </div>
+
+<!-- Add this modal HTML before the closing </div> of landing-container -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" role="dialog" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forgotPasswordModalLabel">Reset Password</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="forgotPasswordForm">
+                    <div class="form-group">
+                        <label for="reset-email">Enter your email address</label>
+                        <input type="email" class="form-control" id="reset-email" name="email" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Send Reset Link</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
     // Switch between login and register tabs
@@ -227,6 +258,7 @@ $(document).ready(function() {
         });
     });
 
+    // Handle login form submission
     $('#loginForm').on('submit', function(e) {
         e.preventDefault();
         
@@ -262,6 +294,154 @@ $(document).ready(function() {
                 });
             }
         });
+    });
+
+    // Forgot Password Link Click
+    $('#forgotPasswordLink').click(function(e) {
+        e.preventDefault();
+        $('#forgotPasswordModal').modal({
+            backdrop: 'static',
+            keyboard: false
+        });
+        $('#forgotPasswordModal').modal('show');
+    });
+
+    // Handle Forgot Password Form Submit
+    $('#modalForgotPasswordForm').on('submit', function(e) {
+        e.preventDefault();
+        
+        $.ajax({
+            url: 'ajax/forgot_password.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    $('#forgotPasswordModal').modal('hide');
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'An error occurred. Please try again.'
+                });
+            }
+        });
+    });
+
+    // Close modal button handler
+    $('.close').click(function() {
+        $('#forgotPasswordModal').modal('hide');
+    });
+});
+</script>
+
+<!-- Add this CSS -->
+<style>
+.forgot-password-link {
+    color: #007bff;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.forgot-password-link:hover {
+    text-decoration: underline;
+}
+
+.modal-backdrop {
+    display: none !important;
+}
+
+.modal {
+    background: rgba(0, 0, 0, 0.5);
+}
+
+.modal.show {
+    display: block;
+}
+
+.modal-dialog {
+    margin: 10% auto;
+    width: 90%;
+    max-width: 500px;
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+}
+
+.close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+</style>
+
+<!-- Add these script tags at the bottom of the page, just before closing </body> tag -->
+<script src="https://code.jquery.com/jquery-3.6.3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+$(document).ready(function() {
+    // Remove any existing backdrops
+    $('.modal-backdrop').remove();
+    
+    $('#forgotPasswordLink').on('click', function(e) {
+        e.preventDefault();
+        // Remove any existing backdrops before showing modal
+        $('.modal-backdrop').remove();
+        var forgotPasswordModal = new bootstrap.Modal(document.getElementById('forgotPasswordModal'), {
+            backdrop: false // Disable Bootstrap's default backdrop
+        });
+        forgotPasswordModal.show();
+    });
+
+    // Close modal handlers
+    $('.btn-close, .close').on('click', function() {
+        var modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+        if (modal) {
+            modal.hide();
+            // Remove backdrop after hiding modal
+            $('.modal-backdrop').remove();
+        }
+    });
+
+    // Also handle escape key
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape') {
+            var modal = bootstrap.Modal.getInstance(document.getElementById('forgotPasswordModal'));
+            if (modal) {
+                modal.hide();
+                $('.modal-backdrop').remove();
+            }
+        }
     });
 });
 </script>

@@ -160,4 +160,46 @@ class Mail {
     public function getError() {
         return $this->error;
     }
+
+    public function sendPasswordReset($email, $reset_link) {
+        try {
+            // Set email content
+            $this->mailer->setFrom(SMTP_USERNAME, SITE_NAME);
+            $this->mailer->addAddress($email);
+            $this->mailer->isHTML(true);
+            
+            $this->mailer->Subject = "Password Reset Request - " . SITE_NAME;
+            
+            // HTML email body
+            $body = "
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;'>
+                    <h2>Password Reset Request</h2>
+                    <p>Hello,</p>
+                    <p>We received a request to reset your password. Click the button below to reset your password:</p>
+                    <p style='text-align: center; margin: 30px 0;'>
+                        <a href='{$reset_link}' 
+                           style='background-color: #007bff; 
+                                  color: white; 
+                                  padding: 12px 25px; 
+                                  text-decoration: none; 
+                                  border-radius: 5px;
+                                  display: inline-block;'>
+                            Reset Password
+                        </a>
+                    </p>
+                    <p>This link will expire in 1 hour.</p>
+                    <p>If you did not request this reset, please ignore this email.</p>
+                    <p>Best regards,<br>" . SITE_NAME . "</p>
+                </div>";
+            
+            $this->mailer->Body = $body;
+            $this->mailer->AltBody = "Reset your password by clicking this link: {$reset_link}";
+            
+            return $this->mailer->send();
+            
+        } catch (Exception $e) {
+            $this->error = $e->getMessage();
+            return false;
+        }
+    }
 } 

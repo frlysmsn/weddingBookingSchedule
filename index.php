@@ -17,6 +17,13 @@ switch($page) {
     case 'home':
         include 'views/landing_page.php';
         break;
+    case 'reset_password':
+        if (isset($_GET['token'])) {
+            include 'views/reset_password.php';
+        } else {
+            header('Location: index.php');
+        }
+        break;
     case 'login':
         include 'views/login.php';
         break;
