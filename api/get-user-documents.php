@@ -95,13 +95,90 @@ $documents = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                 onclick="approveDocument(<?= $doc['id'] ?>)">
                             <i class="fas fa-check"></i> Approve
                         </button>
-                        <button class="btn btn-sm btn-danger" 
+                        <button class="btn btn-sm btn-danger me-2" 
                                 onclick="rejectDocument(<?= $doc['id'] ?>)">
                             <i class="fas fa-times"></i> Reject
                         </button>
                     <?php endif; ?>
+                    <button class="btn btn-sm btn-danger" 
+                            onclick="deleteDocument(<?= $doc['id'] ?>)">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
                 </div>
             </div>
         </div>
     <?php endforeach; ?>
-</div> 
+</div>
+
+<!-- Add SweetAlert2 CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+function deleteDocument(documentId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this deletion!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading state
+            Swal.fire({
+                title: 'Deleting...',
+                html: 'Please wait while we delete the document.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+
+            fetch('../api/delete-document.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'document_id=' + documentId
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove the document card from the UI
+                    const documentCard = document.querySelector(`.document-item:has(button[onclick="deleteDocument(${documentId})"])`);
+                    if (documentCard) {
+                        documentCard.remove();
+                    }
+                    
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Document has been deleted successfully.',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.message,
+                        icon: 'error',
+                        confirmButtonText: 'OK'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'An error occurred while deleting the document',
+                    icon: 'error',
+                    confirmButtonText: 'OK'
+                });
+            });
+        }
+    });
+}
+</script> 
