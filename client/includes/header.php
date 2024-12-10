@@ -17,6 +17,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client') {
     <!-- SweetAlert2 -->
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
     <!-- Custom CSS -->
+     <!--Favicon-->
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../assets/images/favicon-16x16.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="../assets/images/apple-touch-icon.png">
+    <!-- Frameworks and Libraries -->
     <style>
         .header {
             background: #fff;
