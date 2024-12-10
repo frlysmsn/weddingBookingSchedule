@@ -4,7 +4,7 @@ require_once '../includes/config.php';
 require_once '../includes/db_connection.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $response = ['success' => false, 'message' => '', 'verified' => false];
+    $response = ['success' => false, 'message' => '', 'verified' => false, 'needsVerification' => false];
     
     try {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
@@ -15,18 +15,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         
         $db = Database::getInstance()->getConnection();
-        $stmt = $db->prepare("SELECT * FROM users WHERE email = ? AND active = 1");
+        $stmt = $db->prepare("SELECT * FROM users WHERE email = ?");
         $stmt->execute([$email]);
         $user = $stmt->fetch();
         
         if (!$user) {
-            throw new Exception('User not found or inactive');
+            throw new Exception('Invalid email or password');
         }
         
         if (password_verify($password, $user['password'])) {
             if (!$user['email_verified']) {
                 $_SESSION['temp_user_id'] = $user['id'];
-                throw new Exception('Please verify your email first.');
+                $response['needsVerification'] = true;
+                $response['message'] = 'Email not verified';
+                echo json_encode($response);
+                exit;
+            }
+            
+            if (!$user['active']) {
+                throw new Exception('Account is inactive. Please contact administrator.');
             }
             
             $_SESSION['user_id'] = $user['id'];

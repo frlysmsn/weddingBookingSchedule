@@ -113,11 +113,8 @@ class Mail {
     public function sendVerificationCode($email, $code) {
         try {
             if (!$this->mailer) {
-                echo "Error: Mailer not initialized properly<br>";
                 throw new Exception('Mailer not initialized properly');
             }
-
-            echo "Attempting to send email to: " . $email . "<br>";
             
             // Clear all recipients first
             $this->mailer->clearAddresses();
@@ -141,16 +138,13 @@ class Mail {
             $this->mailer->Body = $body;
             $this->mailer->AltBody = "Your verification code is: {$code}";
             
-            $result = $this->mailer->send();
-            if (!$result) {
-                echo "Mailer Error: " . $this->mailer->ErrorInfo . "<br>";
+            if (!$this->mailer->send()) {
                 throw new Exception($this->mailer->ErrorInfo);
             }
-            echo "Email sent successfully!<br>";
+            
             return true;
             
         } catch (Exception $e) {
-            echo "Exception caught: " . $e->getMessage() . "<br>";
             $this->error = $e->getMessage();
             error_log("Mail sending error: " . $this->error);
             return false;

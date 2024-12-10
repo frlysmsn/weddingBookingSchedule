@@ -445,3 +445,133 @@ $(document).ready(function() {
     });
 });
 </script>
+
+<!-- Email Verification Modal -->
+<div class="modal fade" id="verificationModal" tabindex="-1" aria-labelledby="verificationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="verificationModalLabel">Email Verification Required</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your email address has not been verified. Please enter the verification code sent to your email.</p>
+                <form id="verificationForm" class="mt-3">
+                    <div class="mb-3">
+                        <label for="verification_code" class="form-label">Verification Code</label>
+                        <input type="text" class="form-control" id="verification_code" required maxlength="6" pattern="[0-9]+" placeholder="Enter 6-digit code">
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary">Verify Email</button>
+                        <button type="button" id="resendCode" class="btn btn-secondary">Resend Code</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Add this to your existing JavaScript
+$(document).ready(function() {
+    // Handle login form submission
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+            url: 'ajax/login.php',
+            type: 'POST',
+            data: $(this).serialize(),
+            dataType: 'json',
+            success: function(response) {
+                if (response.needsVerification) {
+                    // Show verification modal
+                    $('#verificationModal').modal('show');
+                } else if (response.success) {
+                    window.location.href = response.redirect;
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again.'
+                });
+            }
+        });
+    });
+
+    // Handle verification form submission
+    $('#verificationForm').on('submit', function(e) {
+        e.preventDefault();
+        const code = $('#verification_code').val();
+        
+        $.ajax({
+            url: 'ajax/verify_email.php',
+            type: 'POST',
+            data: { verification_code: code },
+            dataType: 'json',
+            success: function(response) {
+                if (response.success) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Success!',
+                        text: response.message,
+                        allowOutsideClick: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = response.redirect;
+                        }
+                    });
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error!',
+                        text: response.message
+                    });
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'An error occurred. Please try again.'
+                });
+            }
+        });
+    });
+
+    // Handle resend code button
+    $('#resendCode').on('click', function() {
+        $(this).prop('disabled', true);
+        
+        $.ajax({
+            url: 'ajax/resend_verification_code.php',
+            type: 'POST',
+            dataType: 'json',
+            success: function(response) {
+                Swal.fire({
+                    icon: response.success ? 'success' : 'error',
+                    title: response.success ? 'Code Sent!' : 'Error!',
+                    text: response.message
+                });
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Failed to resend verification code.'
+                });
+            },
+            complete: function() {
+                $('#resendCode').prop('disabled', false);
+            }
+        });
+    });
+});
+</script>

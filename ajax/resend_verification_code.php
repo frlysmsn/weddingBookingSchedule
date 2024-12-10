@@ -7,6 +7,7 @@ require_once '../includes/Mail.php';
 $response = ['success' => false, 'message' => ''];
 
 try {
+    // Check if session exists
     if (!isset($_SESSION['temp_user_id'])) {
         throw new Exception('Invalid session. Please try registering again.');
     }
@@ -14,8 +15,11 @@ try {
     $user_id = $_SESSION['temp_user_id'];
     $db = Database::getInstance()->getConnection();
 
+    // Start transaction
+    $db->beginTransaction();
+
     // Fetch user email
-    $stmt = $db->prepare("SELECT email FROM users WHERE id = ?");
+    $stmt = $db->prepare("SELECT email, verification_code FROM users WHERE id = ?");
     $stmt->execute([$user_id]);
     $user = $stmt->fetch();
 
@@ -32,16 +36,28 @@ try {
         throw new Exception('Failed to update verification code.');
     }
 
-    // Send verification email
+    // Try to send the verification email
     $mailer = new Mail();
-    if (!$mailer->sendVerificationCode($email, $verification_code)) {
+    $emailSent = $mailer->sendVerificationCode($email, $verification_code);
+
+    if (!$emailSent) {
+        // If email fails, rollback the database changes and throw exception
+        $db->rollBack();
         throw new Exception('Failed to send verification code: ' . $mailer->getError());
     }
 
+    // If we got here, both database update and email sending were successful
+    $db->commit();
     $response['success'] = true;
-    $response['message'] = 'Verification code resent successfully.';
+    $response['message'] = 'Verification code sent successfully to your email.';
 
 } catch (Exception $e) {
+    // Ensure transaction is rolled back on error
+    if (isset($db) && $db->inTransaction()) {
+        $db->rollBack();
+    }
+    
+    $response['success'] = false;
     $response['message'] = $e->getMessage();
     error_log("Resend verification code error: " . $e->getMessage());
 }
