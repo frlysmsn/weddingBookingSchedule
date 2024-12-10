@@ -6,6 +6,7 @@ session_start();
 require_once '../includes/config.php';
 require_once '../includes/db_connection.php';
 require_once '../includes/Mail.php';
+require_once '../includes/Authentication.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = ['success' => false, 'message' => ''];
@@ -26,8 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception('Passwords do not match.');
         }
 
-        if (strlen($password) < 6) {
-            throw new Exception('Password must be at least 6 characters long.');
+        // Validate password strength
+        $auth = new Authentication();
+        $passwordValidation = $auth->validatePassword($password);
+        
+        if (!$passwordValidation['valid']) {
+            throw new Exception('Password requirements not met: ' . implode(', ', $passwordValidation['errors']));
         }
 
         $db = Database::getInstance()->getConnection();

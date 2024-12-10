@@ -8,6 +8,40 @@ class Authentication {
         $this->db = Database::getInstance()->getConnection();
     }
 
+    public function validatePassword($password) {
+        $errors = [];
+        
+        if (strlen($password) < 8) {
+            $errors[] = "Password must be at least 8 characters long";
+        }
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors[] = "Password must contain at least one uppercase letter";
+        }
+        if (!preg_match('/[0-9]/', $password)) {
+            $errors[] = "Password must contain at least one number";
+        }
+        if (!preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) {
+            $errors[] = "Password must contain at least one special character";
+        }
+        
+        return [
+            'valid' => empty($errors),
+            'errors' => $errors,
+            'strength' => $this->calculatePasswordStrength($password)
+        ];
+    }
+
+    private function calculatePasswordStrength($password) {
+        $strength = 0;
+        
+        if (strlen($password) >= 8) $strength += 25;
+        if (preg_match('/[A-Z]/', $password)) $strength += 25;
+        if (preg_match('/[0-9]/', $password)) $strength += 25;
+        if (preg_match('/[!@#$%^&*()\-_=+{};:,<.>]/', $password)) $strength += 25;
+        
+        return $strength;
+    }
+
     public function login($email, $password) {
         try {
             $stmt = $this->db->prepare("SELECT * FROM users WHERE email = ?");

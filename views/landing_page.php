@@ -153,14 +153,39 @@ if ($auth->isLoggedIn()) {
                         <input type="email" id="reg-email" name="email" class="form-control" required>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="reg-password">Password</label>
-                        <input type="password" id="reg-password" name="password" class="form-control" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="reg-password" name="password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="reg-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <div class="password-strength mt-2" style="display: none;">
+                            <div class="progress" style="height: 5px;">
+                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="strength-text text-muted"></small>
+                            <div class="requirements text-muted">
+                                <small>Password must contain:</small>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-circle fa-xs req-length"></i> At least 8 characters</li>
+                                    <li><i class="fas fa-circle fa-xs req-uppercase"></i> One uppercase letter</li>
+                                    <li><i class="fas fa-circle fa-xs req-number"></i> One number</li>
+                                    <li><i class="fas fa-circle fa-xs req-special"></i> One special character</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group mb-3">
                         <label for="confirm-password">Confirm Password</label>
-                        <input type="password" id="confirm-password" name="confirm_password" class="form-control" required>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                     </div>
 
                     <div class="form-group">
@@ -400,6 +425,16 @@ $(document).ready(function() {
     font-size: 1.5rem;
     cursor: pointer;
 }
+
+.password-strength .progress-bar {
+    transition: width 0.3s ease;
+}
+.password-strength .progress-bar.weak { background-color: #dc3545; }
+.password-strength .progress-bar.medium { background-color: #ffc107; }
+.password-strength .progress-bar.strong { background-color: #28a745; }
+.requirements li { font-size: 0.8rem; }
+.requirements .fa-circle { font-size: 0.5rem; margin-right: 5px; color: #dc3545; }
+.requirements .valid .fa-circle { color: #28a745; }
 </style>
 
 <!-- Add these script tags at the bottom of the page, just before closing </body> tag -->
@@ -572,6 +607,82 @@ $(document).ready(function() {
                 $('#resendCode').prop('disabled', false);
             }
         });
+    });
+});
+</script>
+
+<script>
+$(document).ready(function() {
+    // Toggle password visibility
+    $('.toggle-password').click(function() {
+        const targetId = $(this).data('target');
+        const input = $(`#${targetId}`);
+        const icon = $(this).find('i');
+        
+        if (input.attr('type') === 'password') {
+            input.attr('type', 'text');
+            icon.removeClass('fa-eye').addClass('fa-eye-slash');
+        } else {
+            input.attr('type', 'password');
+            icon.removeClass('fa-eye-slash').addClass('fa-eye');
+        }
+    });
+
+    // Password strength checker
+    $('#reg-password').on('input', function() {
+        const password = $(this).val();
+        const strengthMeter = $('.password-strength');
+        const progressBar = strengthMeter.find('.progress-bar');
+        const strengthText = strengthMeter.find('.strength-text');
+        
+        // Show strength meter when user starts typing
+        strengthMeter.show();
+        
+        // Check requirements
+        const hasLength = password.length >= 8;
+        const hasUpper = /[A-Z]/.test(password);
+        const hasNumber = /[0-9]/.test(password);
+        const hasSpecial = /[!@#$%^&*()\-_=+{};:,<.>]/.test(password);
+        
+        // Update requirement indicators
+        $('.req-length').parent()[hasLength ? 'addClass' : 'removeClass']('valid');
+        $('.req-uppercase').parent()[hasUpper ? 'addClass' : 'removeClass']('valid');
+        $('.req-number').parent()[hasNumber ? 'addClass' : 'removeClass']('valid');
+        $('.req-special').parent()[hasSpecial ? 'addClass' : 'removeClass']('valid');
+        
+        // Calculate strength
+        let strength = 0;
+        if (hasLength) strength += 25;
+        if (hasUpper) strength += 25;
+        if (hasNumber) strength += 25;
+        if (hasSpecial) strength += 25;
+        
+        // Update progress bar
+        progressBar.width(strength + '%');
+        progressBar.removeClass('weak medium strong');
+        
+        if (strength <= 25) {
+            progressBar.addClass('weak');
+            strengthText.text('Weak');
+        } else if (strength <= 75) {
+            progressBar.addClass('medium');
+            strengthText.text('Medium');
+        } else {
+            progressBar.addClass('strong');
+            strengthText.text('Strong');
+        }
+    });
+
+    // Confirm password validation
+    $('#confirm-password').on('input', function() {
+        const password = $('#reg-password').val();
+        const confirmPassword = $(this).val();
+        
+        if (confirmPassword && password !== confirmPassword) {
+            $(this).addClass('is-invalid');
+        } else {
+            $(this).removeClass('is-invalid');
+        }
     });
 });
 </script>
