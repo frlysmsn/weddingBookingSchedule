@@ -33,6 +33,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login - <?= SITE_NAME ?></title>
     <link href='../assets/css/style.css' rel='stylesheet'>
+    <link rel="icon" type="image/x-icon" href="../assets/images/favicon.png">
+    <link rel="icon" type="image/png" href="../assets/images/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="../assets/images/favicon-16x16.png" sizes="16x16">
+    <link rel="apple-touch-icon" href="../assets/images/apple-touch-icon.png">
 </head>
 <body class="admin-login-page">
     <div class="auth-container">

@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 28, 2025 at 04:30 PM
--- Server version: 10.4.32-MariaDB
--- PHP Version: 8.2.12
+-- Generation Time: Dec 03, 2024 at 03:44 PM
+-- Server version: 10.4.28-MariaDB
+-- PHP Version: 8.2.4
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -66,8 +66,7 @@ CREATE TABLE `bookings` (
 --
 
 INSERT INTO `bookings` (`id`, `user_id`, `wedding_date`, `preferred_time`, `groom_name`, `bride_name`, `contact_number`, `email`, `status`, `selected_optional_doc`, `created_at`, `updated_at`, `document_progress`, `bride_dob`, `bride_birthplace`, `bride_mother`, `bride_father`, `bride_interview`, `bride_seminar`, `groom_dob`, `groom_birthplace`, `groom_mother`, `groom_father`, `groom_interview`, `groom_seminar`, `is_confirmed`, `confirmation_date`, `bride_prenup`, `bride_precana`, `groom_prenup`, `groom_precana`) VALUES
-(106, 55, '2024-12-04', '09:00:00', 'Eanz Marvic Go', 'Jelian Tasan Morga', '09546246763', 'jelianmaemorga@gmail.com', 'approved', NULL, '2024-12-03 14:21:33', '2024-12-03 14:22:13', 0.00, '2024-12-26', 'Cebu city', 'Maria Morga', 'Ron Morga', 0, 0, '2024-12-26', 'tacloban', 'Jasmine Go', 'Don Go', 0, 0, 0, NULL, 'yes', 'yes', 'yes', 'yes'),
-(107, 56, '2025-04-30', '08:00:00', 'Ferly andrino Samson', 'Ferly andrino Samson', '09317609172', 'samsonferly7@gmail.com', 'approved', NULL, '2025-04-28 14:22:41', '2025-04-28 14:23:20', 0.00, '2002-02-18', 'ormoc', 'edna batican', 'rogelio samson', 0, 0, '2001-03-19', 'ormoc', 'ivy gabin', 'jonathan samson', 0, 0, 0, NULL, 'yes', 'yes', 'yes', 'yes');
+(106, 55, '2024-12-04', '09:00:00', 'Eanz Marvic Go', 'Jelian Tasan Morga', '09546246763', 'jelianmaemorga@gmail.com', 'approved', NULL, '2024-12-03 14:21:33', '2024-12-03 14:22:13', 0.00, '2024-12-26', 'Cebu city', 'Maria Morga', 'Ron Morga', 0, 0, '2024-12-26', 'tacloban', 'Jasmine Go', 'Don Go', 0, 0, 0, NULL, 'yes', 'yes', 'yes', 'yes');
 
 -- --------------------------------------------------------
 
@@ -89,8 +88,7 @@ CREATE TABLE `booking_actions` (
 --
 
 INSERT INTO `booking_actions` (`id`, `booking_id`, `action_type`, `reason`, `acted_by`, `created_at`) VALUES
-(48, 106, 'approved', NULL, 3, '2024-12-03 14:22:13'),
-(49, 107, 'approved', NULL, 30, '2025-04-28 14:23:20');
+(48, 106, 'approved', NULL, 3, '2024-12-03 14:22:13');
 
 -- --------------------------------------------------------
 
@@ -118,12 +116,7 @@ INSERT INTO `documents` (`id`, `document_type`, `file_path`, `status`, `remarks`
 (178, 'baptismal', 'uploads/documents/55/baptismal_1733235446.pdf', 'approved', '', '2024-12-03 14:17:26', '2024-12-03 14:18:48', 55, NULL),
 (179, 'birth_certificate', 'uploads/documents/55/birth_certificate_1733235456.pdf', 'approved', '', '2024-12-03 14:17:36', '2024-12-03 14:18:43', 55, NULL),
 (180, 'confirmation', 'uploads/documents/55/confirmation_1733235463.pdf', 'approved', '', '2024-12-03 14:17:43', '2024-12-03 14:18:33', 55, NULL),
-(181, 'cenomar', 'uploads/documents/55/cenomar_1733235474.pdf', 'approved', '', '2024-12-03 14:17:54', '2024-12-03 14:18:20', 55, NULL),
-(182, 'baptismal', 'uploads/documents/56/baptismal_1745845331.pdf', 'approved', '', '2025-04-28 13:02:11', '2025-04-28 13:03:33', 56, NULL),
-(183, 'birth_certificate', 'uploads/documents/56/birth_certificate_1745845338.pdf', 'approved', '', '2025-04-28 13:02:18', '2025-04-28 13:03:27', 56, NULL),
-(184, 'confirmation', 'uploads/documents/56/confirmation_1745845346.pdf', 'approved', '', '2025-04-28 13:02:26', '2025-04-28 13:03:20', 56, NULL),
-(185, 'cenomar', 'uploads/documents/56/cenomar_1745845351.pdf', 'approved', '', '2025-04-28 13:02:31', '2025-04-28 13:03:14', 56, NULL),
-(186, 'marriage_license', 'uploads/documents/56/marriage_license_1745845360.pdf', 'approved', '', '2025-04-28 13:02:40', '2025-04-28 13:03:07', 56, NULL);
+(181, 'cenomar', 'uploads/documents/55/cenomar_1733235474.pdf', 'approved', '', '2024-12-03 14:17:54', '2024-12-03 14:18:20', 55, NULL);
 
 -- --------------------------------------------------------
 
@@ -192,8 +185,7 @@ INSERT INTO `users` (`id`, `name`, `email`, `password`, `role`, `created_at`, `a
 (23, 'cherry', 'cherry@gmail.com', '$2y$10$QjJYB1VaYjxjJmoc9fFm6e0ioG2.n9anXlQ8jUdBoYfGMtcWm79QO', 'admin', '2024-12-01 06:01:21', 1, NULL, 0),
 (30, 'Admin', 'admin@admin1.com', '$2y$10$ADPnZasp1PDbXN/QBa0haOxQMuwdJ/jXAz1I.LBzUZ1uX48USfnUe', 'admin', '2024-12-01 16:49:05', 1, NULL, 0),
 (35, 'Kylan Cleveland', 'kylieviasulibran12@gmail.com', '$2y$10$LFpuMobIEe.t/vedLW1ZNOqi.4UtMg9nLhm4H5Ip1qwQNz2Eqc7/q', 'client', '2024-12-03 03:22:50', 0, NULL, 0),
-(55, 'Jelian Morga', 'jelianmaemorga@gmail.com', '$2y$10$UJAwGO/nDPlz2.gBgR1L8eNfrDq1alGy0QAo7pwJvKgiPaTFjQsdS', 'client', '2024-12-03 14:16:21', 1, NULL, 1),
-(56, 'Ferly Samson', 'samsonferly7@gmail.com', '$2y$10$6.5JYFQ.QyPzJYeK1NiD.eLZB9N75ChNKvRV5swEMvomCnirBvXTK', 'client', '2025-04-28 12:59:41', 1, NULL, 1);
+(55, 'Jelian Morga', 'jelianmaemorga@gmail.com', '$2y$10$UJAwGO/nDPlz2.gBgR1L8eNfrDq1alGy0QAo7pwJvKgiPaTFjQsdS', 'client', '2024-12-03 14:16:21', 1, NULL, 1);
 
 --
 -- Indexes for dumped tables
@@ -252,19 +244,19 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `bookings`
 --
 ALTER TABLE `bookings`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=108;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=107;
 
 --
 -- AUTO_INCREMENT for table `booking_actions`
 --
 ALTER TABLE `booking_actions`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=50;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=49;
 
 --
 -- AUTO_INCREMENT for table `documents`
 --
 ALTER TABLE `documents`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=187;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=182;
 
 --
 -- AUTO_INCREMENT for table `document_requirements`
@@ -282,7 +274,7 @@ ALTER TABLE `unavailable_dates`
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=57;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=56;
 
 --
 -- Constraints for dumped tables

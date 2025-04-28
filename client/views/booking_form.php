@@ -102,34 +102,35 @@ if (!$hasPendingBooking) {
 <?php else: ?>
     <div class="row">
         <!-- Calendar Column -->
-        <div class="col-md-4 mb-4">
-            <div class="card">
-                <div class="card-header">
-                    <h5 class="card-title">Wedding Calendar</h5>
+<div class="col-md-4 mb-4">
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title">Wedding Calendar 🎯</h5>
+        </div>
+        <div class="card-body">
+            <div id="weddingCalendar"></div>
+            <div class="calendar-legend mt-3">
+                <div class="legend-item">
+                    <div class="legend-color available"></div>
+                    <span>Available</span>
                 </div>
-                <div class="card-body">
-                    <div id="weddingCalendar"></div>
-                    <div class="calendar-legend mt-3">
-                        <div class="legend-item">
-                            <div class="legend-color available"></div>
-                            <span>Available</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color fully-booked"></div>
-                            <span>Fully Booked</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color partially-booked"></div>
-                            <span>Partially Booked</span>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color sunday"></div>
-                            <span>Sunday</span>
-                        </div>
-                    </div>
+                <div class="legend-item">
+                    <div class="legend-color fully-booked"></div>
+                    <span>Fully Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color partially-booked"></div>
+                    <span>Partially Booked</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color sunday"></div>
+                    <span>Sunday</span>
                 </div>
             </div>
         </div>
+    </div>
+</div>
+
 
         <!-- Booking Form Column -->
         <div class="col-md-8">
@@ -560,80 +561,172 @@ if (!$hasPendingBooking) {
     </div>
 
     <script>
-    $(document).ready(function() {
-        const calendarEl = document.getElementById('weddingCalendar');
-        if (!calendarEl) return;
+// JavaScript - Wedding Calendar Setup
+$(document).ready(function() {
+    const calendarEl = document.getElementById('weddingCalendar');
+    if (!calendarEl) return;
 
-        const calendar = new FullCalendar.Calendar(calendarEl, {
-            initialView: 'dayGridMonth',
-            selectable: true,
-            headerToolbar: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'dayGridMonth'
-            },
-            events: {
-                url: 'ajax/get_booked_dates.php',
-                method: 'GET',
-                failure: function(error) {
-                    console.error('Error details:', error);
-                }
-            },
-            select: function(info) {
-                const selectedDate = info.startStr;
-                $('#wedding_date').val(selectedDate);
-                
-                // Clear previous selection
-                $('.selected-date').removeClass('selected-date');
-                $(info.dayEl).addClass('selected-date');
-                
-                // Fetch available times
-                $.ajax({
-                    url: 'ajax/get_available_times.php',
-                    method: 'GET',
-                    dataType: 'json',
-                    data: { date: selectedDate },
-                    success: function(response) {
-                        console.log('Response:', response); // Debug log
-                        
-                        const timeSelect = $('select[name="preferred_time"]');
-                        timeSelect.empty();
-                        timeSelect.append('<option value="">Select Time Slot</option>');
-                        
-                        if (response.success) {
-                            // Get the booked times array
-                            const bookedTimes = response.booked_times || [];
-                            console.log('Booked times:', bookedTimes); // Debug log
-                            
-                            // Define available time slots with database format
-                            const timeSlots = {
-                                '08:00:00': '8:00 AM - 9:00 AM',
-                                '09:00:00': '9:00 AM - 10:00 AM',
-                                '13:00:00': '1:00 PM - 2:00 PM'
-                            };
-                            
-                            // Only add unbooked time slots to the dropdown
-                            Object.entries(timeSlots).forEach(([value, label]) => {
-                                if (!bookedTimes.includes(value)) {
-                                    timeSelect.append(`<option value="${value}">${label}</option>`);
-                                }
-                            });
-                        }
-                        
-                        timeSelect.prop('disabled', false);
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Ajax error:', error); // Debug log
-                        const timeSelect = $('select[name="preferred_time"]');
-                        timeSelect.empty()
-                            .append('<option value="">Error loading time slots</option>')
-                            .prop('disabled', true);
-                    }
-                });
+    const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        selectable: true,
+        headerToolbar: {
+            left: 'prev,next today',
+            center: 'title',
+            right: 'dayGridMonth'
+        },
+
+        // Combined Events: Booked Dates + Holidays
+        events: function(fetchInfo, successCallback, failureCallback) {
+    const year = fetchInfo.start.getFullYear();
+    const month = fetchInfo.start.getMonth() + 1; // Month is 0-indexed
+
+    Promise.all([
+        fetch('ajax/get_booked_dates.php')
+            .then(response => response.json()),
+        fetch(`https://ph-holiday-api.fly.dev/api/holidays/${year}/${month}`, {
+            headers: {
+                'Authorization': 'n7Ia9nnPOTWRAjPRbKc90l6iKPRVICSOZ7zIbm7qVJhz48bG8jkEZ7wIwP9K'
             }
+        }).then(response => response.json())
+    ])
+    .then(([bookedData, holidays]) => {
+        const events = [];
+
+        // Add booked dates
+        if (Array.isArray(bookedData)) {
+            bookedData.forEach(item => {
+                events.push({
+                    title: item.title || 'Booked',
+                    start: item.date,
+                    allDay: true,
+                    backgroundColor: item.status === 'fully_booked' ? '#e74c3c' : 
+                                     item.status === 'partially_booked' ? '#f39c12' : 
+                                     '#27ae60',
+                    borderColor: 'transparent',
+                    classNames: [item.status]  // Add a class to event for CSS targeting
+                });
+            });
+        }
+
+        // Add holidays from the API
+        if (Array.isArray(holidays)) {
+            holidays.forEach(holiday => {
+                events.push({
+                    title: holiday.name,
+                    start: holiday.date,
+                    allDay: true,
+                    className: 'holiday' // Special class for holidays
+                });
+            });
+        }
+
+        // Static holidays (additional holidays)
+        const additionalHolidays = [
+            { title: "Christmas Day", start: "2025-12-25", className: 'holiday' },
+            { title: "New Year's Day", start: "2025-01-01", className: 'holiday' },
+            { title: "Labor Day", start: "2025-05-01", className: 'holiday' },
+
+            { title: "New Year's Day", start: "2026-01-01", className: 'holiday' }
+        ];
+        additionalHolidays.forEach(holiday => {
+            events.push(holiday);
         });
-        
-        calendar.render();
+
+        successCallback(events);
+    })
+    .catch(error => {
+        console.error('Error fetching events:', error);
+        failureCallback(error);
+    });
+},
+
+
+        // Handle selecting a date
+        select: function(info) {
+            const selectedDate = info.startStr;
+            $('#wedding_date').val(selectedDate);
+
+            // Clear previous selection
+            $('.selected-date').removeClass('selected-date');
+            $(info.dayEl).addClass('selected-date');
+
+            // Check if the selected date is a holiday
+            const selected = new Date(selectedDate);
+            const year = selected.getFullYear();
+            const month = selected.getMonth() + 1;
+            const day = selected.getDate();
+
+            fetch(`https://ph-holiday-api.fly.dev/api/holidays/${year}/${month}/${day}`, {
+                headers: {
+                    'Authorization': 'n7Ia9nnPOTWRAjPRbKc90l6iKPRVICSOZ7zIbm7qVJhz48bG8jkEZ7wIwP9K'
+                }
+            })
+            .then(response => response.json())
+            .then(holiday => {
+                if (holiday && holiday.name) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Holiday Notice!',
+                        text: `${holiday.name} falls on this date.`,
+                        confirmButtonText: 'Okay'
+                    });
+                    $(info.dayEl).addClass('holiday');
+                }
+            })
+            .catch(() => {
+                console.log('Holiday API request failed or no holiday found.');
+            });
+
+            // Fetch available time slots
+            $.ajax({
+                url: 'ajax/get_available_times.php',
+                method: 'GET',
+                dataType: 'json',
+                data: { date: selectedDate },
+                success: function(response) {
+                    const timeSelect = $('select[name="preferred_time"]');
+                    timeSelect.empty();
+                    timeSelect.append('<option value="">Select Time Slot</option>');
+
+                    if (response.success) {
+                        const bookedTimes = response.booked_times || [];
+                        const timeSlots = {
+                            '08:00:00': '8:00 AM - 9:00 AM',
+                            '09:00:00': '9:00 AM - 10:00 AM',
+                            '13:00:00': '1:00 PM - 2:00 PM'
+                        };
+
+                        Object.entries(timeSlots).forEach(([value, label]) => {
+                            if (!bookedTimes.includes(value)) {
+                                timeSelect.append(`<option value="${value}">${label}</option>`);
+                            }
+                        });
+                    }
+
+                    timeSelect.prop('disabled', false);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Ajax error:', error);
+                    const timeSelect = $('select[name="preferred_time"]');
+                    timeSelect.empty()
+                        .append('<option value="">Error loading time slots</option>')
+                        .prop('disabled', true);
+                }
+            });
+        },
+
+        // Highlight Sundays (Optional)
+        dayCellDidMount: function(info) {
+            const date = info.date;
+            if (date.getDay() === 0) { // Sunday = 0
+                info.el.classList.add('sunday');
+            }
+        }
+    });
+
+    calendar.render();
+
+    
 
         // When "Proceed to Confirmation" is clicked
         $('#proceedToConfirmation').click(function(e) {
@@ -818,6 +911,7 @@ if (!$hasPendingBooking) {
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
 
+
 <style>
 /* Calendar container */
 #weddingCalendar {
@@ -954,7 +1048,7 @@ if (!$hasPendingBooking) {
 .fully-booked-date { background-color: #ffcdd2 !important; }
 .partially-booked-date { background-color: #fff3cd !important; }
 .fc-day-sun { background-color: #e3f2fd !important; }
-.selected-date { border: 2px solid #1976d2 !important; }
+.selected-date { border: 2px solid #28a745 !important; }
 
 /* Clean up calendar header */
 .fc-header-toolbar {
@@ -999,6 +1093,60 @@ select option:disabled {
 select option {
     padding: 8px;
 }
+
+/* FullCalendar overrides */
+.fc-daygrid-day.available {
+    background-color: #28a745 !important; /* Green */
+}
+
+.fc-daygrid-day.fully-booked {
+    background-color: #dc3545 !important; /* Red */
+}
+
+.fc-daygrid-day.partially-booked {
+    background-color: #ffc107 !important; /* Yellow */
+}
+
+.fc-daygrid-day.holiday {
+    background-color: #ffd6d6 !important; /* Light red for holidays */
+}
+
+.fc-daygrid-day.sunday {
+    background-color: #fff0b3 !important; /* Light yellow for Sundays */
+}
+
+/* Legend colors */
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.legend-color {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    border-radius: 4px;
+}
+
+.legend-color.available {
+    background-color: #28a745 !important; /* Green */
+}
+
+.legend-color.fully-booked {
+    background-color: #dc3545; /* Red */
+}
+
+.legend-color.partially-booked {
+    background-color: #ffc107; /* Yellow */
+}
+
+.legend-color.sunday {
+    background-color: #fff0b3; /* Light Yellow */
+}
+
+</style>
+
 </style>
 
 <script src="assets/js/booking_form.js"></script> 

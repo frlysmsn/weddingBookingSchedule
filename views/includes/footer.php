@@ -9,7 +9,7 @@
                 <div class="footer-section">
                     <h3>Quick Links</h3>
                     <ul>
-                        <li style><a href="index.php">Home</a></li>
+                        <li><a href="index.php">Home</a></li>
                         <?php if(isset($_SESSION['user_id'])): ?>
                             <li><a href="index.php?page=booking">Book Now</a></li>
                         <?php else: ?>
@@ -18,8 +18,8 @@
                 </div>
                 <div class="footer-section">
                     <h3>Contact</h3>
-                    <p>Email: info@stritawedding.com</p>
-                    <p>Phone: (123) 456-7890</p>
+                    <p>Email: stritaparishwedding@gmail.com</p>
+                    <p>Phone: +639456847868</p>
                 </div>
             </div>
             <div class="footer-bottom">

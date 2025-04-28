@@ -35,9 +35,9 @@ if ($auth->isLoggedIn()) {
                     Our beautiful church provides the perfect setting for your special day.
                 </p>
                 <div class="parish-contact">
-                    <p><i class="fas fa-map-marker-alt"></i> 123 Church Street, Your City</p>
-                    <p><i class="fas fa-phone"></i> (123) 456-7890</p>
-                    <p><i class="fas fa-envelope"></i> info@stritamission.com</p>
+                    <p><i class="fas fa-map-marker-alt"></i> Sitio Biasong, Brgy Puerto Bello, Merida, Leyte, Philippines</p>
+                    <p><i class="fas fa-phone"></i> +639456847868</p>
+                    <p><i class="fas fa-envelope"></i>  stritaparishwedding@gmail.com</p>
                 </div>
             </div>
         </section>
@@ -161,6 +161,17 @@ if ($auth->isLoggedIn()) {
                                 <i class="fas fa-eye"></i>
                             </button>
                         </div>
+                      
+                    
+
+                    <div class="form-group mb-3">
+                        <label for="confirm-password">Confirm Password</label>
+                        <div class="input-group">
+                            <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
+                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm-password">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
                         <div class="password-strength mt-2" style="display: none;">
                             <div class="progress" style="height: 5px;">
                                 <div class="progress-bar" role="progressbar" style="width: 0%"></div>
@@ -176,17 +187,7 @@ if ($auth->isLoggedIn()) {
                                 </ul>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="form-group mb-3">
-                        <label for="confirm-password">Confirm Password</label>
-                        <div class="input-group">
-                            <input type="password" class="form-control" id="confirm-password" name="confirm_password" required>
-                            <button class="btn btn-outline-secondary toggle-password" type="button" data-target="confirm-password">
-                                <i class="fas fa-eye"></i>
-                            </button>
-                        </div>
-                    </div>
+                    
 
                     <div class="form-group">
                         <button type="submit" name="register" class="btn btn-primary btn-block">Register</button>
