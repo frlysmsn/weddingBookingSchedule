@@ -4,7 +4,7 @@
             <div class="footer-content">
                 <div class="footer-section">
                     <h3><?= SITE_NAME ?></h3>
-                    <p>Making your special day perfect.</p>
+                    <p>Making your special day perfect.</p> 
                 </div>
                 <div class="footer-section">
                     <h3>Quick Links</h3>
