@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '../../includes/config.php';
-require_once '../../includes/db_connection.php';
+require_once '../../includes/db_connection.php'; 
 require_once '../../includes/Mail.php';
 
 header('Content-Type: application/json');
