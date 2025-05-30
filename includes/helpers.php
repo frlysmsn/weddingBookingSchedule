@@ -3,7 +3,7 @@
 function formatDate($date, $format = 'F d, Y') {
     return date($format, strtotime($date));
 }
-
+ 
 function getStatusBadge($status) {
     $badges = [
         'pending' => 'status-badge status-pending',
