@@ -3,7 +3,7 @@ require_once 'db_connection.php';
 
 class Authentication {
     private $db;
-
+ 
     public function __construct() {
         $this->db = Database::getInstance()->getConnection();
     }
