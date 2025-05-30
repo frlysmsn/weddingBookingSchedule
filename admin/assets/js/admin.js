@@ -4,7 +4,7 @@ $(document).ready(function() {
         e.preventDefault();
         $('body').toggleClass('sidebar-collapsed');
         
-        // Save state in cookie
+        // Save state in cookie 
         document.cookie = `sidebarState=${$('body').hasClass('sidebar-collapsed') ? 'collapsed' : 'expanded'}; path=/; max-age=31536000`;
     });
 
