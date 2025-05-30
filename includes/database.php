@@ -6,7 +6,7 @@ class Database {
     private $database = 'st_rita_wedding';  // Updated database name
     private $conn;
 
-    public function __construct() {
+    public function __construct() { 
         $this->conn = new mysqli($this->host, $this->username, $this->password, $this->database);
         
         if ($this->conn->connect_error) {
