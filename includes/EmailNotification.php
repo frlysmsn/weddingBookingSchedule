@@ -4,7 +4,7 @@ use PHPMailer\PHPMailer\Exception;
 
 require 'vendor/autoload.php';
 
-class EmailNotification {
+class EmailNotification { 
     private $mailer;
 
     public function __construct() {
