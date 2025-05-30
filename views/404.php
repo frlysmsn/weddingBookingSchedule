@@ -4,7 +4,7 @@
     <p>The page you are looking for might have been removed, had its name changed, or is temporarily unavailable.</p>
     <a href="index.php" class="btn btn-primary">Return to Homepage</a>
 </div>
-
+ 
 <style>
 .error-container {
     text-align: center;
