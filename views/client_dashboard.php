@@ -2,7 +2,7 @@
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'client') {
     header('Location: index.php?page=login');
     exit;
-}
+} 
 
 $db = Database::getInstance()->getConnection();
 $stmt = $db->prepare("SELECT * FROM bookings WHERE user_id = ?");
