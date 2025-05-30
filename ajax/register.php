@@ -10,7 +10,30 @@ require_once '../includes/Authentication.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $response = ['success' => false, 'message' => ''];
-    
+
+    // 👉 Add reCAPTCHA verification
+    $recaptcha_secret = '6LfMXFArAAAAAPI2obnNgPgrnHiXidmcWM-YzfBL'; 
+    $recaptcha_response = $_POST['g-recaptcha-response'] ?? '';
+
+    if (empty($recaptcha_response)) {
+        $response['message'] = 'Please complete the reCAPTCHA.';
+        ob_end_clean();
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+
+    $verify = file_get_contents("https://www.google.com/recaptcha/api/siteverify?secret={$recaptcha_secret}&response={$recaptcha_response}");
+    $captcha_success = json_decode($verify);
+
+    if (!$captcha_success || !$captcha_success->success) {
+        $response['message'] = 'reCAPTCHA verification failed.';
+        ob_end_clean();
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+
     try {
         $email = filter_input(INPUT_POST, 'email', FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'];
