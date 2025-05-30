@@ -61,7 +61,7 @@ $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
                                             <i class="fas fa-eye"></i>
                                         </button>
                                         <button class="btn btn-sm btn-warning" onclick="toggleUserStatus(<?= $admin['id'] ?>)">
-                                            <i class="fas fa-ban"></i>
+                                            <i class="fas fa-pen"></i>
                                         </button>
                                         <button class="btn btn-sm btn-danger" onclick="demoteAdmin(<?= $admin['id'] ?>)">
                                             <i class="fas fa-arrow-down"></i> Demote
@@ -113,7 +113,7 @@ $admins = $stmtAdmins->fetchAll(PDO::FETCH_ASSOC);
                                         <i class="fas fa-eye"></i>
                                     </button>
                                     <button class="btn btn-sm btn-warning" onclick="toggleUserStatus(<?= $client['id'] ?>)">
-                                        <i class="fas fa-ban"></i>
+                                        <i class="fas fa-pen"></i>
                                     </button>
                                     <button class="btn btn-sm btn-danger" onclick="deleteUser(<?= $client['id'] ?>)">
                                         <i class="fas fa-trash"></i>
