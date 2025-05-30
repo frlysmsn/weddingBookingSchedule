@@ -7,7 +7,7 @@
             <div class="form-group">
                 <label for="email">Email Address</label>
                 <input type="email" 
-                       id="email" 
+                       id="email"  
                        name="email" 
                        class="form-control" 
                        required  
