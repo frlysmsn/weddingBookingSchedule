@@ -2,7 +2,7 @@
 // Check if user has a temporary ID
 if (!isset($_SESSION['temp_user_id'])) {
     header('Location: index.php');
-    exit;
+    exit; 
 }
 ?>
 
