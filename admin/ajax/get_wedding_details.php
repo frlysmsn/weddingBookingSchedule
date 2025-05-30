@@ -4,7 +4,7 @@ require_once '../../includes/config.php';
 require_once '../../includes/db_connection.php';
 
 if(!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
-    http_response_code(403);
+    http_response_code(403); 
     exit('Unauthorized');
 }
 
