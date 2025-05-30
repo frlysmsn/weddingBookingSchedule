@@ -8,7 +8,7 @@ $auth = new Authentication();
 
 // Basic routing
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
-
+ 
 // Header
 include 'views/includes/header.php';
 
