@@ -36,7 +36,7 @@ if ($auth->isLoggedIn()) {
                 </p>
                 <div class="parish-contact">
                     <p><i class="fas fa-map-marker-alt"></i> Sitio Biasong, Brgy Puerto Bello, Merida, Leyte, Philippines</p>
-                    <p><i class="fas fa-phone"></i> +639456847868</p>
+                    <p><i class="fas fa-phone"></i> +63 931 760 9172</p>
                     <p><i class="fas fa-envelope"></i>  stritaparishwedding@gmail.com</p>
                 </div>
             </div>
@@ -186,6 +186,10 @@ if ($auth->isLoggedIn()) {
                                     <li><i class="fas fa-circle fa-xs req-special"></i> One special character</li>
                                 </ul>
                             </div>
+                        </div>
+<br>
+                        <div class="form-group">
+                            <div class="g-recaptcha" data-sitekey="6LfMXFArAAAAAMgWKXd6EXDEsypM6tpHr6dN28R_"></div>
                         </div>
                     
 
@@ -443,6 +447,8 @@ $(document).ready(function() {
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
 
 <script>
 $(document).ready(function() {
