@@ -2,7 +2,7 @@
 // Turn off output buffering
 ob_start();
 
-session_start();
+session_start(); 
 require_once '../includes/config.php';
 require_once '../includes/db_connection.php';
 require_once '../includes/Mail.php';
