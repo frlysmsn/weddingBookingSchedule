@@ -6,7 +6,7 @@ ini_set('display_errors', 1);
 $upload_dir = __DIR__ . '/uploads/documents';
 
 echo "<h2>Upload Directory Check</h2>";
-echo "<pre>";
+echo "<pre>"; 
 
 // Check if directory exists
 if (!file_exists($upload_dir)) {
