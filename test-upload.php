@@ -3,7 +3,7 @@ session_start();
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
-// Simulate a logged-in user if needed
+// Simulate a logged-in user if needed 
 if (!isset($_SESSION['user_id'])) {
     $_SESSION['user_id'] = 1; // Replace with a valid user ID
 }
