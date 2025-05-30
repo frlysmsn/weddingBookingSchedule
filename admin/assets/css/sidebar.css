@@ -3,7 +3,7 @@
     --primary-color: #4e73df;
 }
 
-/* Sidebar */
+/* Sidebar */ 
 .sidebar {
     width: var(--sidebar-width);
     height: 100vh;
