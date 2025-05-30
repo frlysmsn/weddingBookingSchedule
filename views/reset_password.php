@@ -1,7 +1,7 @@
 <?php
 if (!isset($_GET['token'])) {
     header('Location: index.php');
-    exit;
+    exit; 
 }
 $token = $_GET['token'];
 ?>
