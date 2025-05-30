@@ -7,7 +7,7 @@
 ## System Overview
 
 The *St. Rita Mission Station - Church Wedding Hall Schedule System* is a web-based platform designed to streamline the scheduling and management of church weddings.
-
+ 
   
 
 ### **Objective**:
