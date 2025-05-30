@@ -6,7 +6,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 class Mail {
     private $mailer;
-    private $error;
+    private $error; 
 
     public function __construct() {
         try {
