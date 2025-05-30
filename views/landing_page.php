@@ -5,7 +5,7 @@ $auth = new Authentication();
 if ($auth->isLoggedIn()) {
     if ($auth->isAdmin()) {
         header('Location: index.php?page=admin-dashboard');
-    } else {
+    } else { 
         header('Location: index.php?page=client-dashboard');
     }
     exit;
