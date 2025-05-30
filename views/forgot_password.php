@@ -10,7 +10,7 @@
                        id="email" 
                        name="email" 
                        class="form-control" 
-                       required 
+                       required  
                        placeholder="Enter your email">
             </div>
             
