@@ -6,7 +6,7 @@ php_value max_input_time 60
 
 # Allow file uploads and protect directory
 Options -Indexes
-Allow from all
+Allow from all 
 
 # Enable rewrite engine
 RewriteEngine On
