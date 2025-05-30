@@ -2,7 +2,7 @@ $(document).ready(function() {
     // Initialize both tables
     const tableConfig = {
         order: [[0, 'desc']],
-        pageLength: 10,
+        pageLength: 10, 
         responsive: true
     };
     
