@@ -12,7 +12,7 @@ function checkUploadSettings() {
     // Check upload directory
     $upload_dir = '../uploads/documents';
     if (!file_exists($upload_dir)) {
-        mkdir($upload_dir, 0777, true);
+        mkdir($upload_dir, 0777, true); 
     }
     
     $settings['upload_dir_writable'] = is_writable($upload_dir);
