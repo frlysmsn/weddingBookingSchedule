@@ -8,7 +8,7 @@ echo "<pre>";
 // Check PHP Version
 echo "PHP Version: " . phpversion() . "\n";
 
-// Check upload settings
+// Check upload settings 
 echo "\nUpload Settings:\n";
 echo "upload_max_filesize: " . ini_get('upload_max_filesize') . "\n";
 echo "post_max_size: " . ini_get('post_max_size') . "\n";
